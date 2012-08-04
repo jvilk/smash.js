@@ -44,6 +44,13 @@ var stageRight = 260;
 
 var fps = 3;
 
+var neutralGroundAttackHitSpeed = 10;
+var neutralAirAttackHitSpeed = 19;
+var sideGroundAttackHitSpeed = 17;
+var airRearAttackHitSpeed = 25;
+var airFrontAttackHitSpeed = 18;
+
+var neutralAttackFrames = 20;
 // Private Helpers
 // ===============
 
@@ -134,9 +141,46 @@ var initCharacter = function (characterId) {
     jumpTimeout: 0
   };
 };
-
-var attack = function (character) {
+var leftAttack = function (character){
   character.attackFrames = 20;
+  if(character.onGround){
+    character.facing = 'left';
+    character.reach_left = character.groundSideReach;
+  }
+  else{
+    if (character.facing === 'left'){
+      character.reach_left = character.aerialFrontReach;
+    }
+    else{
+      character.reach_left = characters.aerialRearReach;
+    }
+  }
+}
+
+var rightAttack = function (character){
+  character.attackFrames = 20;
+  if(character.onGround){
+    character.facing = 'right';
+    character.reach_right = character.groundSideReach;
+    character.action = 'rightGroundAttack';
+  }
+  else{
+    if (character.facing === 'right'){
+      character.reach_right = character.aerialFrontReach;
+      character.action = 'rightAerialFrontAttack';
+    }
+    else{
+      character.reach_right = characters.aerialRearReach;
+      character.action = 'rightAerialRearAttack';
+    }
+  }
+  for (var i = characters.length - 1; i >= 0; i--) {
+    rightAttackCollision(character, characters[i]);
+  }
+}
+
+var neutralAttack = function (character) {
+  character.attackFrames = neutralAttackFrames;
   if (character.onGround){
     if (character.facing === 'right'){
       character.reach_right = groundNeutralReach;      
@@ -162,15 +206,82 @@ var attack = function (character) {
 
 var neutralAttackCollision = function(attacker, victim){
     if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+      var dir = 0;
       if ((attacker.facing === 'left') && (victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
-        victim.v_x -= neutralAttackHitSpeed;
+        dir = -1;
 
       }
       if ((attacker.facing === 'right') && (victim.x).isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
-        victim.v_x += neutralAttackHitSpeed;
+        dir = +1;
       }
+      if(dir != 0){
+        if(attacker.onGround){
+          victim.v_x += dir * neutralGroundAttackHitSpeed;
+        }
+        else{
+          victim.v_x += dir * neutralAirAttackHitSpeed;
+        }
+        if (dir === 1){
+          victim.state = 'hitRight';
+        }
+        if (dir === -1){
+          victim.state = 'hitLeft';
+        }
+
+    }
     }
   };
+
+var leftAttackCollision = function(attacker, victim){
+  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+    var dir = 0;
+    if ((victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
+      var dir = -1;
+      if(attacker.onGround){
+        victim.v_x+= dir * leftGroundAttackHitSpeed;
+      }
+    
+      else{
+        if (attacker.facing === 'left'){
+          victim.v_x += dir * airFrontAttackHitSpeed;
+        }
+        if (attacker.facing === 'right'){
+          victim.v_x += dir * airRearAttackHitSpeed;
+        }
+      }
+    }
+  }
+}
+
+var rightAttackCollision = function(attacker, victim){
+  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+    var dir = 0;
+    if (victim.x.isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
+      dir = 1;
+      if(attacker.onGround){
+        victim.v_x+= dir * leftGroundAttackHitSpeed;
+      }
+    
+      else{
+        if (attacker.facing === 'left'){
+          victim.v_x += dir * airFrontAttackHitSpeed;
+        }
+        if (attacker.facing === 'right'){
+          victim.v_x += dir * airRearAttackHitSpeed;
+        }
+      }
+    }
+  }
+}
+
+var upAttackCollision = function(attacker, victim){
+
+}
+
+var downAttackCollision = function(attacker, victim){
+
+}
+
 
 var moveLeft = function (character) {
   if (character.onGround) {
@@ -256,9 +367,30 @@ var runMove = function (characterId) {
         moveDown(character);
         break;
       case 'attack':
-        attack(character);
+        if(canMove(character)){
+          neutralAttack(character);
+        }
         break;
-
+      case 'leftAttack':
+        if(canMove(character)){
+          leftAttack(character);
+        }
+        break;
+      case 'rightAttack':
+        if(canMove(character)){
+          rightAttack(character);
+        }
+        break;
+      case 'downAttack':
+        if(canMove(character)){
+          downAttack(character);
+        }
+        break;
+      case 'upAttack':
+        if(canMove(character)){
+          upAttack(character);
+        }
+        break;
       // Basic attacks
       // Special moves
       // No movement
