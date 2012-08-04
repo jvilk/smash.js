@@ -149,7 +149,7 @@ myDirectives.directive('smashGame', function (socket) {
 
           // draw character damage
           // =====================
-          /*
+          
           // set font style
           fontSize = iconHeight * 3/5;
           ctx.font = fontSize + "px Arial";
@@ -161,7 +161,7 @@ myDirectives.directive('smashGame', function (socket) {
             x,
             y - iconHeight/2 + portraitHeight/2
           );
-          */
+          
         });
 
       });
