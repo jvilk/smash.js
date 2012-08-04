@@ -44,7 +44,7 @@ app.get('*', routes.index);
 
 // Socket.io Communication
 
-io.sockets.on('connection', socket);
+io.sockets.on('connection', socket, io.sockets);
 
 // Start server
 

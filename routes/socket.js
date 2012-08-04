@@ -11,5 +11,5 @@ module.exports = function (socket) {
     socket.emit('send:time', {
       time: (new Date()).toString()
     });
-  }, 1000);
+  }, 30);
 };
