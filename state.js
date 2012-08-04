@@ -10,7 +10,7 @@ var state,
 var numCharacters = 1;
 // World state
 var gravity = 3;
-var dt = 1/24;
+var dt = 1/16;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
@@ -37,7 +37,7 @@ var stageHeight = 390;
 var stageLeft = 1010;
 var stageRight = 270;
 
-var fps = 5;
+var fps = 3;
 
 // Private Helpers
 // ===============
@@ -112,9 +112,9 @@ var moveUp = function (character) {
     character.jumps -= 1;
     character.jumpTimeout = 20;
     if (character.onGround) {
-      character.v_y = -200;
+      character.v_y = -120;
     } else {
-      character.v_y -= 100;
+      character.v_y -= 80;
     }
   }
 };
