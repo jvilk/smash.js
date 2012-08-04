@@ -1,34 +1,47 @@
 // Imports
 // =======
-var stage = require('./stage');
+var stage = require('./stage.js');
 
 // State Vars
 // ==========
 var state,
   moveQueue;
-
+// Num players
 var numCharacters = 1;
-var max_ground_x = 50;
-var max_ground_y = 50;
+// World state
 var gravity = -5;
-var max_air_jumps = 1;
 var dt = 1/24;
+var spawnSpacing = 50;
+var spawnHeight = 10;
+// Game option
+var maxGroundSpeed = 50;
+var maxAirJumps = 1;
 
 // Private Helpers
 // ===============
 var initCharacter = function (characterId) {
   return {
-    x: characterId * 50,
-    y: 10,
+    // Position
+    x: characterId * spawnSpacing,
+    y: spawnHeight,
+    // Velocity
     v_x: 0,
     v_y: 0,
+    // Acceleration
     a_x: 0,
-    a_y: 0,
+    a_y: gravity,
+    // Character area (hit box)
+    height: 100,
+    width: 30,
+    // Character state
     onGround: true,
     airJumps: 0,
     damage: 0,
-    height: 100,
-    width: 30
+    // Vars for attacks
+    reach_left: 0,
+    reach_right: 0,
+    reach_bottom: 0,
+    reach_top: 0
   };
 };
 
@@ -38,33 +51,31 @@ var runMove = function (characterId) {
     // Basic movement
     case 'left':
       if (character.onGround) {
-        character.a_x = -5;
+        character.a_x = -25;
       } else {
-        character.a_x = -3;
+        character.a_x = -10;
       }
       break;
     case 'right':
       if (character.onGround) {
-        character.a_x = 5;
+        character.a_x = 25;
       } else {
-        character.a_x = 3;
+        character.a_x = 10;
       }
       break;
     case 'up':
       if (character.onGround) {
         character.a_y = 5;
       } else {
-        if (character.airJumps <= max_air_jumps) {
+        if (character.airJumps <= maxAirJumps) {
           character.a_y = 3;
           character.airJumps++;
         }
       }
       break;
     case 'down':
-      if (character.onGround) {
+      if (!character.onGround) {
         character.a_y = -5;
-      } else {
-        character.a_y = -3;
       }
       break;
     // Basic attacks
@@ -79,27 +90,32 @@ var runMove = function (characterId) {
     case 'right_a':
       break;
     // Special moves
-
     // No movement
     default:
       character.a_x = 0;
       character.a_y = gravity;
       break;
   }
+
 };
 
 var updateCharacterMotion = function (characterId) {
   var character = state.characters[characterId];
   // Velocity calculation
-  //Characters have a max ground velocity, no max air velocity
+  character.v_x += character.a_x * dt;
+  character.v_y += character.a_y * dt;
+  // Characters have a max ground velocity, no max air velocity
   if (character.onGround) {
-    character.v_x = Math.min(max_ground_x, character.v_x + character.a_x * dt);
-    character.v_y = Math.max(0, Math.min(max_ground_y, character.v_y + character.a_y * dt));
-  } else {
-    character.v_x += character.a_x * dt;
-    character.v_y += character.a_y * dt;
+    if (character.v_x > maxGroundSpeed) {
+      character.v_x = maxGroundSpeed;
+    } else if (character.v_x < -maxGroundSpeed) {
+      character.v_x = -maxGroundSpeed;
+    }
+    // v_y cannot be negative on the ground
+    if (character.v_y < 0) {
+      character.v_y = 0;
+    }
   }
-
   // Position calculation
   character.x += character.v_x * dt;
   character.y += character.v_y * dt;
@@ -108,6 +124,7 @@ var updateCharacterMotion = function (characterId) {
 // Public API
 // ==========
 module.exports = {
+  // Restart the game
   restart: function (newNumCharacters) {
     numCharacters = newNumCharacters;
     state = {
@@ -119,7 +136,7 @@ module.exports = {
     }
     moveQueue = [];
   },
-
+  // Update frame using latest actions
   runFrame: function () {
     // Calculate position using velocity / acceleration
     for (var i = 0; i < numCharacters; i++) {
@@ -127,7 +144,6 @@ module.exports = {
     }
     // Attacks
     for (var i = 0; i < numCharacters; i++) {
-      //attacks(i);
       //detectHits(i);
     }
     // Detect collision (optional)
@@ -135,19 +151,20 @@ module.exports = {
     for (var i = 0; i < numCharacters; i++) {
       character = state.characters[i];
       // if bottom left && bottom right have collided assume ground
-      if (stage.hasCollided(character.x, character.y) || stage.hasCollided(character.x+character.width, character.y)){
+      if (stage.hasCollided(character.x, character.y) ||
+          stage.hasCollided(character.x+character.width, character.y)) {
         state.characters[i].onGround = true;
         character.v_y = 0;
         character.a_y = 0;
+      } else {
+        //state.characters[i].onGround = false;
       }
+    }
+
+    for (var i = 0; i < numCharacters; i++) {
       updateCharacterMotion(i);
       moveQueue[i] = null;
-    }
-  },
-
-  detectHits: function(playerId) {
-    x = state.characters[playerId];
-    y = state.characters[playerId];
+    };
   },
 
   setMove: function (player, move) {
@@ -172,7 +189,9 @@ module.exports = {
   getConfig: function () {
     return {
       gravity: gravity,
-      dt: dt
+      dt: dt,
+      spawnSpacing: spawnSpacing,
+      spawnHeight: spawnHeight
     }
   }
 };
