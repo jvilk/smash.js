@@ -157,6 +157,18 @@ module.exports = {
   get: function () {
     return state;
   },
+  getSerialized: function () {
+    return {
+      characters: state.characters.map(function (ch) {
+        return {
+          x: ch.x,
+          y: ch.y,
+          height: ch.height,
+          width: ch.width
+        };
+      })
+    };
+  },
   getConfig: function () {
     return {
       gravity: gravity,
