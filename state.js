@@ -9,13 +9,23 @@ var state,
 // Num players
 var numCharacters = 1;
 // World state
-var gravity = -5;
+var gravity = 5;
 var dt = 1/24;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
 var maxGroundSpeed = 50;
 var maxAirJumps = 1;
+// Attack reaches
+var groundNeutralReach = 10;
+var aerialNeutralReach = 12;
+var groundSideReach = 15;
+var aerialFrontReach = 15;
+var aerialRearReach = 12;
+var groundUpReach = 10;
+var aerialUpReach = 15;
+var groundDownReach = 8;
+var aerialDownReach = 10;
 
 // Private Helpers
 // ===============
@@ -24,6 +34,8 @@ var initCharacter = function (characterId) {
     // Position
     x: characterId * spawnSpacing,
     y: spawnHeight,
+    // Direction facing
+    facing: 'left',
     // Velocity
     v_x: 0,
     v_y: 0,
@@ -33,8 +45,9 @@ var initCharacter = function (characterId) {
     // Character area (hit box)
     height: 100,
     width: 30,
-    // Character state
-    onGround: true,
+    // TODO Character state
+    // state: 'stun',
+    onGround: false,
     airJumps: 0,
     damage: 0,
     // Vars for attacks
@@ -65,29 +78,78 @@ var runMove = function (characterId) {
       break;
     case 'up':
       if (character.onGround) {
-        character.a_y = 5;
+        character.a_y = -5;
       } else {
         if (character.airJumps <= maxAirJumps) {
-          character.a_y = 3;
+          character.a_y = -3;
           character.airJumps++;
+        }
+        else{
+          character.a_x = 0;
+          character.a_y = gravity;
         }
       }
       break;
     case 'down':
       if (!character.onGround) {
-        character.a_y = -5;
+        character.a_y = 10;
       }
       break;
     // Basic attacks
     case 'a':
+      if (character.onGround) {
+        if (charcter.facing === 'left') {
+          character.reach_left = 10;
+        } else if (charcter.facing === 'right') {
+          character.reach_right = 10;
+        } else {
+          throw new Error('where are you facing?');
+        }
+      } else {
+        if (charcter.facing === 'left') {
+          character.reach_left = 8;
+        } else if (charcter.facing === 'right') {
+          character.reach_right = 8;
+        } else {
+          throw new Error('where are you facing?');
+        }
+      }
       break;
     case 'up_a':
+      if (character.onGround) {
+        character.reach_top = 10;
+      } else {
+        character.reach_top = 15;
+      }
       break;
     case 'down_a':
+      if (character.onGround) {
+        character.reach_left = 5;
+        character.reach_right = 5;
+      } else {
+        character.reach_bottom = 10;
+      }
       break;
     case 'left_a':
+      if (character.onGround) {
+        if (charcter.facing === 'left') {
+          character.reach_left = 15;
+        } else if (charcter.facing === 'right') {
+          character.reach_left = 12;
+        } else {
+          throw new Error('where are you facing?');
+        }
+        character.reach_left = 15;
+      } else {
+        character.reach_left = 12;
+      }
       break;
     case 'right_a':
+      if (character.onGround) {
+        character.reach_right = 15;
+      } else {
+        
+      }
       break;
     // Special moves
     // No movement
@@ -112,7 +174,7 @@ var updateCharacterMotion = function (characterId) {
       character.v_x = -maxGroundSpeed;
     }
     // v_y cannot be negative on the ground
-    if (character.v_y < 0) {
+    if (character.v_y > 0) {
       character.v_y = 0;
     }
   }
@@ -138,11 +200,11 @@ module.exports = {
   },
   // Update frame using latest actions
   runFrame: function () {
-    // Calculate position using velocity / acceleration
+    // Process moves
     for (var i = 0; i < numCharacters; i++) {
       runMove(i);
     }
-    // Attacks
+    // Process hits
     for (var i = 0; i < numCharacters; i++) {
       //detectHits(i);
     }
@@ -191,7 +253,9 @@ module.exports = {
       gravity: gravity,
       dt: dt,
       spawnSpacing: spawnSpacing,
-      spawnHeight: spawnHeight
+      spawnHeight: spawnHeight,
+      maxGroundSpeed: maxGroundSpeed,
+      maxAirJumps : maxAirJumps
     }
   }
 };

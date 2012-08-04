@@ -1,6 +1,7 @@
-// $(document).ready(main);
+$(document).ready(main);
 
 function main() {
+  prefetchImages(['link', 'kirby', 'asshole']);
   var characters = [
     {
       portrait: "link-sprite",
@@ -177,4 +178,15 @@ function refresh(elt, characters) {
     });
 
   })
+}
+
+function prefetchImages(characterArr) {
+  var body = $('body');
+  var div;
+  $.each(characterArr, function(index, name) { 
+    div = '<img id="'+ name +'-portrait" src="/images/'+ name +'/portrait.gif">';
+    body.append(div);
+    div = '<img id="'+ name +'-sprite" src="/images/'+ name +'/sprite.gif">';
+    body.append(div);
+  });
 }
