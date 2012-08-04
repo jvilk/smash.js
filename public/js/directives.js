@@ -24,5 +24,5 @@ myDirectives.directive('smashGame', function (socket) {
         refresh(canvas[0], state.characters);
       });
     }
-  }
+  };
 });
