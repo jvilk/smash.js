@@ -1,4 +1,4 @@
-$(document).ready(main);
+// $(document).ready(main);
 
 function main() {
   var characters = [
@@ -50,12 +50,12 @@ function main() {
       char.x += 10*(Math.random() - 0.5);
       char.y += 10*(Math.random() - 0.5);
     });
-    refresh(characters);
+    refresh($("#game"), characters);
   }, 1000/60);
 }
 
-function refresh(characters) {
-  var canvas = $("#game");
+function refresh(elt, characters) {
+  var canvas = $(elt).clearCanvas();
 
   // draw background
   canvas.drawImage({
