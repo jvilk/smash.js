@@ -15,7 +15,7 @@ var state,
 var numCharacters = 1;
 // World state
 var gravity = 3;
-var dt = 1/24;
+var dt = 1/16;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
@@ -32,17 +32,17 @@ var aerialUpReach = 15;
 var groundDownReach = 8;
 var aerialDownReach = 10;
 
-var mapWidth = 720;
-var mapHeight = 1280;
+var mapWidth = 1280;
+var mapHeight = 720;
 var deathMargin = 200;
 
 var stageHeight = 390;
 
 //these numbers are random guesses and subject to change
-var stageLeft = 300;
-var stageRight = 900;
+var stageLeft = 1010;
+var stageRight = 260;
 
-var fps = 5;
+var fps = 3;
 
 // Private Helpers
 // ===============
@@ -198,9 +198,9 @@ var moveUp = function (character) {
     character.jumps -= 1;
     character.jumpTimeout = 20;
     if (character.onGround) {
-      character.v_y = -200;
+      character.v_y = -120;
     } else {
-      character.v_y -= 100;
+      character.v_y -= 80;
     }
   }
 };
@@ -229,7 +229,6 @@ var runMove = function (characterId) {
       // Basic movement
       case 'left':
         moveLeft(character);
-        
         break;
       case 'right':
         moveRight(character);
@@ -278,7 +277,7 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight && character.x < stageRight && character.x > stageLeft) {
+  if (character.y > stageHeight && (character.y - character.v_y*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
@@ -292,7 +291,11 @@ var runMove = function (characterId) {
     if (character.jumpTimeout > 0) {
       character.jumpTimeout -= 1;
     }
+  } else if(character.x < stageRight || character.x > stageLeft) {
+    character.onGround = false;
   }
+
+
 
   if (character.attackFrames > 0) {
     character.attackFrames -= 1;
