@@ -35,7 +35,7 @@ var stageHeight = 390;
 
 //these numbers are random guesses and subject to change
 var stageLeft = 1010;
-var stageRight = 270;
+var stageRight = 260;
 
 var fps = 3;
 
