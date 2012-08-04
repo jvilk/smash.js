@@ -51,7 +51,10 @@ myDirectives.directive('smashGame', function (socket) {
         if (num < 10) {
           num = '0' + num;
         }
-        ret[item.name].push(makeImg(lowRes + '/' + item.name + '/' + num + '.png'))
+        ret[item.name].push({
+          left: makeImg(lowRes + '/' + item.name + '_left/' + num + '.png'),
+          right: makeImg(lowRes + '/' + item.name + '_right/' + num + '.png')
+        })
       }
     })
 
@@ -97,7 +100,7 @@ myDirectives.directive('smashGame', function (socket) {
           if (ch.facing === 'left') {}
           */
           ctx.drawImage(
-            charResource[ch.action][ch.frame],
+            charResource[ch.action][ch.frame][ch.facing],
             ch.x,
             ch.y
           );

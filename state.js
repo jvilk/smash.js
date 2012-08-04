@@ -70,6 +70,10 @@ var initCharacter = function (characterId) {
   };
 };
 
+var attack = function (character) {
+  attackFrames
+}
+
 var moveLeft = function (character) {
   if (character.onGround) {
     character.v_x = -75;
@@ -109,50 +113,60 @@ var moveDown = function (character) {
   }
 };
 
+var canMove = function (character) {
+  return character.damageFrames <= 0 && character.attackFrames <= 0;
+}
+
 var runMove = function (characterId) {
   var character = state.characters[characterId];
-  switch (moveQueue[characterId]) {
-    // Basic movement
-    case 'left':
-      moveLeft(character);
-      
-      break;
-    case 'right':
-      moveRight(character);
-      break;
-    case 'leftUp':
-      moveLeft(character);
-      moveUp(character);
-      break;
-    case 'rightUp':
-      moveRight(character);
-      moveUp(character);
-      break;
-    case 'leftDown':
-      moveLeft(character);
-      moveDown(character);
-      break;
-    case 'rightDown':
-      moveRight(character);
-      moveDown(character);
-      break;
-    case 'up':
-      moveUp(character);
-      break;
-    case 'down':
-      moveDown(character);
-      break;
-    // Basic attacks
-    // Special moves
-    // No movement
-    default:
-      character.v_x = 0;
-      character.action = 'stand';
-      break;
+  if (canMove(character)) {
+    switch (moveQueue[characterId]) {
+      // Basic movement
+      case 'left':
+        moveLeft(character);
+        
+        break;
+      case 'right':
+        moveRight(character);
+        break;
+      case 'leftUp':
+        moveLeft(character);
+        moveUp(character);
+        break;
+      case 'rightUp':
+        moveRight(character);
+        moveUp(character);
+        break;
+      case 'leftDown':
+        moveLeft(character);
+        moveDown(character);
+        break;
+      case 'rightDown':
+        moveRight(character);
+        moveDown(character);
+        break;
+      case 'up':
+        moveUp(character);
+        break;
+      case 'down':
+        moveDown(character);
+        break;
+      case 'attack':
+        attack(character);
+        break;
+      // Basic attacks
+      // Special moves
+      // No movement
+      default:
+        character.v_x = 0;
+        character.action = 'stand';
+        break;
+    }
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight) {
+  // TODO: find dimensions of stage on map
+  if (character.y > stageHeight && x > 200 && x < 1000) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
@@ -166,6 +180,20 @@ var runMove = function (characterId) {
     if (character.jumpTimeout > 0) {
       character.jumpTimeout -= 1;
     }
+  }
+
+  if (character.attackFrames > 0) {
+    character.attackFrames -= 1;
+    if (attackFrames === 0) {
+      character.reach_left = 0;
+      character.reach_right = 0;
+      character.reach_bottom = 0;
+      character.reach_top = 0;
+    }
+  }
+
+  if (character.damageFrames > 0) {
+    character.damageFrames -= 1;
   }
 
   // Position calculation
