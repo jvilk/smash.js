@@ -119,6 +119,7 @@ var initCharacter = function (characterId) {
   var characters = initCharacters();
   var character = characters[characterId % characters.length];
   var state = {
+    characterId : characterId,
     // Position
     x: characterId * spawnSpacing + 500,
     y: spawnHeight,
@@ -229,7 +230,7 @@ var neutralAttack = function (character) {
 
 var neutralAttackCollision = function(attacker, victim) {
   //console.log(attacker, victim);
-  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height))) {
+  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height/2).between(victim.y, victim.y + victim.height))) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
