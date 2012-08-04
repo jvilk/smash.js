@@ -8,11 +8,11 @@
 }
 
 .menu:before {
-  content: "[";
+  content: "[ ";
 }
 
 .menu:after {
-  content: "]";
+  content: " ]";
 }
 
 .menu > li {
@@ -20,7 +20,7 @@
 }
 
 .menu > li:before {
-  content: "|";
+  content: " | ";
   padding-right: 0.3em;
 }
 
