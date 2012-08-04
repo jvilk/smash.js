@@ -18,7 +18,7 @@ var state,
 var numCharacters = 1;
 // World state
 var gravity = 3;
-var dt = 1/16;
+var dt = 1/6;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
@@ -40,6 +40,7 @@ var sideGroundAttackHitSpeed = 17;
 var airRearAttackHitSpeed = 25;
 var airFrontAttackHitSpeed = 18;
 
+var lastHit;
 var neutralAttackFrames = 20;
 // Private Helpers
 // ===============
@@ -148,7 +149,8 @@ var initCharacter = function (characterId) {
     // state variables
     attackFrames: 0,
     damageFrames: 0,
-    invulFrames: 0,
+    invulnFrames: 0,
+    lastHit : -1,
     jumps: character.maxAirJumps,
     jumpTimeout: 0
   };
@@ -228,7 +230,7 @@ var neutralAttack = function (character) {
 
 var neutralAttackCollision = function(attacker, victim) {
   //console.log(attacker, victim);
-  if (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height)) {
+  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height))) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
@@ -237,20 +239,24 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
+      victim.lastHit = attacker.characterId;
       victim.damage += Math.round(Math.random()*10)
       victim.airJumps = 0;
-      victim.damage += 100;
+      victim.damage += 40;
       dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
-        victim.damage += 10;
+        victim.damage += 15;
         victim.v_x += dir * attacker.neutralGroundAttackHitSpeed;
       } else{
+        victim.damage += 25;
+
         victim.v_x += dir * attacker.neutralAirAttackHitSpeed;
       }
       victim.state = 'stun';
       victim.onGround = false;
       victim.v_y = -80 * (1+victim.damage/500);
       victim.damageFrames = 50+victim.damage/20;
+      victim.invulnFrames = 15;
       //console.log(victim)
     }
   }
@@ -446,6 +452,13 @@ var runMove = function (characterId) {
 
   if (character.attackFrames > 0) {
     character.attackFrames -= 1;
+    var characters = state.characters;
+    for (var i = characters.length - 1; i >= 0; i--) {  
+      if (character !== characters[i]) {
+        neutralAttackCollision(character, characters[i]);
+      }
+    }
+
     if (character.attackFrames === 0) {
       character.reach_left = 0;
       character.reach_right = 0;
@@ -459,6 +472,10 @@ var runMove = function (characterId) {
     if (character.damageFrames <= 2) {
       character.action = 'stand'
     }
+  }
+
+  if (character.invulnFrames > 0){
+    character.invulnFrames -= 1;
   }
 
   // Position calculation
