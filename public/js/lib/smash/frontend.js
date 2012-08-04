@@ -1,6 +1,7 @@
 //$(document).ready(main);
 
 function main() {
+  prefetchImages(['link', 'kirby', 'asshole']);
   var characters = [
     {
       portrait: "images/link/sprite.gif",
@@ -122,4 +123,13 @@ function refresh(elt, characters) {
       fillStyle: "#00F"
     });
   })
+}
+
+function prefetchImages(characterArr) {
+  var body = $('body');
+  $.each(characterArr, function(index, name) { 
+    console.log('foo');
+    body.append('img').attr('id', name+'-portrait').attr('src', '/images/'+ name +'/portrait.gif');
+    body.append('img').attr('id', name+'-spire').attr('src', '/images/'+ name +'/sprite.gif');
+  });
 }
