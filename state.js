@@ -27,16 +27,23 @@ var aerialUpReach = 15;
 var groundDownReach = 8;
 var aerialDownReach = 10;
 
-var stageHeight = 400;
-
 var mapWidth = 720;
 var mapHeight = 1280;
 var deathMargin = 200;
+
+var stageHeight = 390;
+
+//these numbers are random guesses and subject to change
+var stageLeft = 300;
+var stageRight = 900;
 
 var fps = 5;
 
 // Private Helpers
 // ===============
+
+
+
 var initCharacter = function (characterId) {
   return {
     // Position
@@ -184,8 +191,7 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  // TODO: find dimensions of stage on map
-  if (character.y > stageHeight && character.x > 200 && character.x < 1000) {
+  if (character.y > stageHeight && character.x < stageRight && character.x > stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
