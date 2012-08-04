@@ -370,29 +370,19 @@ var runMove = function (characterId) {
         moveDown(character);
         break;
       case 'attack':
-        if(canMove(character)){
-          neutralAttack(character);
-        }
+        neutralAttack(character);
         break;
       case 'leftAttack':
-        if(canMove(character)){
-          leftAttack(character);
-        }
+        leftAttack(character);
         break;
       case 'rightAttack':
-        if(canMove(character)){
-          rightAttack(character);
-        }
+        rightAttack(character);
         break;
       case 'downAttack':
-        if(canMove(character)){
-          downAttack(character);
-        }
+        downAttack(character);
         break;
       case 'upAttack':
-        if(canMove(character)){
-          upAttack(character);
-        }
+        upAttack(character);
         break;
       // Basic attacks
       // Special moves
