@@ -1,4 +1,6 @@
-p This is the partial for view 2.
-p
-  | Showing of 'interpolate' filter:
-  | {{ 'Current version is v%VERSION%.' | interpolate }}
+.span12(ng-controller='NameCtrl')
+  h3 Change your name
+  p Your current user name is {{name}}
+  form(ng-submit='changeName()')
+    input(ng-model='newName')
+    input(type='submit', value='Change Name')

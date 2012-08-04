@@ -12,7 +12,7 @@ myDirectives.directive('appVersion', function(version) {
 });
 
 
-myDirectives.directive('smashGame', function (socket) {
+myDirectives.directive('smashGame', function (socket, $rootScope) {
 
   var characterNames = [
     'Link',
@@ -89,7 +89,27 @@ myDirectives.directive('smashGame', function (socket) {
       var canvas = aCanvas[0];
       var ctx = canvas.getContext('2d');
 
-      socket.on('send:state', function (state) {
+      var players = [];
+      players.length = 4;
+
+      socket.on('send:players', function (p) {
+        players = p.players;
+        $rootScope.players = p.players;
+        p.queue = p.queue.map(function (item) {
+          return item.data;
+        });
+        $rootScope.queue = p.queue;
+        $rootScope.leaders = p.players.slice(0).
+          concat(p.queue).
+          filter(function (item) {
+            return item;
+          }).
+          sort(function (a, b) {
+            return a.kills < b.kills;
+          });
+      });
+      
+      socket.quietOn('send:state', function (state) {
         var characters = state.characters;
 
         // clear canvas
@@ -142,9 +162,9 @@ myDirectives.directive('smashGame', function (socket) {
           ctx.align = 'center';
 
           ctx.fillText(
-            charResource.name,
+            players[i] ? players[i].name : charResource.name,
             x,
-            y + iconHeight/2 - fontSize/2
+            y + iconHeight/2 - fontSize/2 + 50
           );
 
           // draw character damage

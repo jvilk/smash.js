@@ -5,19 +5,11 @@ block body
     h2 Hello {{name}}
     ul.menu
       li
-        a(href='play') Play!
+        a(href='name') Choose a name
       li
-        a(href='debug') Debug
+        a(href='play') Play!
 
     .row(ng-view)
-
-    .row
-      .span12
-        h3 Change your name
-        p Your current user name is {{name}}
-        form(ng-submit='changeName()')
-          input(ng-model='newName')
-          input(type='submit', value='Change Name')
 
   script(src='js/lib/jquery-1.7.2.js')
   script(src='js/lib/angular/angular.js')
