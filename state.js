@@ -487,7 +487,7 @@ var runMove = function (characterId) {
     var i, fn;
     for (i = 0; i < deathHook.length; i++) {
       fn = deathHook[i]
-      if (fn(characterId)) {
+      if (fn(characterId, character.lastHit)) {
         break;
       }
     }
