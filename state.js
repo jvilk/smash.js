@@ -29,10 +29,17 @@ var aerialDownReach = 10;
 
 var stageHeight = 600;
 
+//these numbers are random guesses and subject to change
+var stageLeft = 300;
+var stageRight = 900;
+
 var fps = 5;
 
 // Private Helpers
 // ===============
+
+
+
 var initCharacter = function (characterId) {
   return {
     // Position
@@ -152,7 +159,7 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight) {
+  if (character.y > stageHeight && character.x < stageRight && character.x > stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
