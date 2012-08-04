@@ -56,10 +56,12 @@ myServices.factory('keys', function ($window, socket) {
   var keyState = {};
 
   $window.addEventListener('keydown', function (ev) {
+    ev.preventDefault();
     keyState[ev.keyCode] = true;
   });
   
   $window.addEventListener('keyup', function (ev) {
+    ev.preventDefault();
     delete keyState[ev.keyCode];
   });
 
