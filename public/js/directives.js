@@ -51,14 +51,17 @@ myDirectives.directive('smashGame', function (socket) {
         if (num < 10) {
           num = '0' + num;
         }
-        ret[item.name].push(makeImg(lowRes + '/' + item.name + '/' + num + '.png'))
+        ret[item.name].push({
+          left: makeImg(lowRes + '/' + item.name + '_left/' + num + '.png'),
+          right: makeImg(lowRes + '/' + item.name + '_right/' + num + '.png')
+        })
       }
     })
 
     return ret;
   });
 
-  var mapImg = makeImg('final-destination.png');
+  var mapImg = makeImg('bg.png');
 
   var canvasWidth = 1280,
     canvasHeight = 720;
@@ -97,7 +100,7 @@ myDirectives.directive('smashGame', function (socket) {
           if (ch.facing === 'left') {}
           */
           ctx.drawImage(
-            charResource[ch.action][ch.frame],
+            charResource[ch.action][ch.frame][ch.facing],
             ch.x,
             ch.y
           );
@@ -109,7 +112,7 @@ myDirectives.directive('smashGame', function (socket) {
         // Draw Character Portraits
         characters.forEach(function (ch, i) {
 
-          var x = canvasWidth * (i + 1)/(characters.length + 1),
+          var x = canvasWidth * (i + 0.82)/(characters.length + 1),
             y = canvasHeight * (4 / 5);
 
           // draw character portrait
