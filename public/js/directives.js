@@ -16,13 +16,14 @@ myDirectives.directive('smashGame', function (socket) {
   return {
     restrict: 'E',
     terminal: true,
+    replace: true,
     link: function(scope, elm, attrs) {
-      var canvas = angular.element('<canvas id="game" width="1280" height="720"></canvas>');
+      var canvas = angular.element('<canvas width="1280" height="720"></canvas>');
       elm.append(canvas);
 
       socket.on('send:state', function (state) {
         refresh(canvas[0], state.characters);
       });
     }
-  }
+  };
 });
