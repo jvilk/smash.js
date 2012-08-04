@@ -9,12 +9,12 @@ var state,
 // Num players
 var numCharacters = 1;
 // World state
-var gravity = 0;
+var gravity = 3;
 var dt = 1/24;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
-var maxGroundSpeed = 50;
+var maxGroundSpeed = 100;
 var maxAirJumps = 1;
 // Attack reaches
 var groundNeutralReach = 10;
@@ -26,6 +26,10 @@ var groundUpReach = 10;
 var aerialUpReach = 15;
 var groundDownReach = 8;
 var aerialDownReach = 10;
+
+var stageHeight = 600;
+
+var fps = 5;
 
 // Private Helpers
 // ===============
@@ -39,9 +43,6 @@ var initCharacter = function (characterId) {
     // Velocity
     v_x: 0,
     v_y: 0,
-    // Acceleration
-    a_x: 0,
-    a_y: gravity,
     // Character area (hit box)
     height: 100,
     width: 30,
@@ -55,9 +56,55 @@ var initCharacter = function (characterId) {
     reach_right: 0,
     reach_bottom: 0,
     reach_top: 0,
+
+    // vars for animation
     frame: 0,
-    action: 'stand'
+    action: 'stand',
+
+    // state variables
+    attackFrames: 0,
+    damageFrames: 0,
+    invulFrames: 0,
+    jumps: 2,
+    jumpTimeout: 0
   };
+};
+
+var moveLeft = function (character) {
+  if (character.onGround) {
+    character.v_x = -75;
+  } else {
+    character.v_x = -50;
+  }
+  character.action = 'run';
+};
+
+var moveRight = function (character) {
+  if (character.onGround) {
+    character.v_x = 75;
+  } else {
+    character.v_x = 50;
+  }
+  character.action = 'run';
+};
+
+var moveUp = function (character) {
+  if (character.jumps > 0 && character.jumpTimeout <= 0) {
+    character.onGround = false;
+    character.jumps -= 1;
+    character.jumpTimeout = 20;
+    if (character.onGround) {
+      character.v_y = -200;
+    } else {
+      character.v_y -= 100;
+    }
+  }
+};
+
+var moveDown = function (character) {
+  if (!character.onGround) {
+    character.v_y += gravity * 2;
+  }
 };
 
 var runMove = function (characterId) {
@@ -65,125 +112,64 @@ var runMove = function (characterId) {
   switch (moveQueue[characterId]) {
     // Basic movement
     case 'left':
-      if (character.onGround) {
-        character.a_x = -25;
-      } else {
-        character.a_x = -10;
-      }
+      moveLeft(character);
+      
       break;
     case 'right':
-      if (character.onGround) {
-        character.a_x = 25;
-      } else {
-        character.a_x = 10;
-      }
+      moveRight(character);
+      break;
+    case 'leftUp':
+      moveLeft(character);
+      moveUp(character);
+      break;
+    case 'rightUp':
+      moveRight(character);
+      moveUp(character);
+      break;
+    case 'leftDown':
+      moveLeft(character);
+      moveDown(character);
+      break;
+    case 'rightDown':
+      moveRight(character);
+      moveDown(character);
       break;
     case 'up':
-      if (character.onGround) {
-        character.a_y = -5;
-      } else {
-        if (character.airJumps <= maxAirJumps) {
-          character.a_y = -3;
-          character.airJumps++;
-        }
-        else{
-          character.a_x = 0;
-          character.a_y = gravity;
-        }
-      }
+      moveUp(character);
       break;
     case 'down':
-      if (!character.onGround) {
-        character.a_y = 10;
-      }
+      moveDown(character);
       break;
     // Basic attacks
-    case 'a':
-      if (character.onGround) {
-        if (charcter.facing === 'left') {
-          character.reach_left = 10;
-        } else if (charcter.facing === 'right') {
-          character.reach_right = 10;
-        } else {
-          throw new Error('where are you facing?');
-        }
-      } else {
-        if (charcter.facing === 'left') {
-          character.reach_left = 8;
-        } else if (charcter.facing === 'right') {
-          character.reach_right = 8;
-        } else {
-          throw new Error('where are you facing?');
-        }
-      }
-      break;
-    case 'up_a':
-      if (character.onGround) {
-        character.reach_top = 10;
-      } else {
-        character.reach_top = 15;
-      }
-      break;
-    case 'down_a':
-      if (character.onGround) {
-        character.reach_left = 5;
-        character.reach_right = 5;
-      } else {
-        character.reach_bottom = 10;
-      }
-      break;
-    case 'left_a':
-      if (character.onGround) {
-        if (charcter.facing === 'left') {
-          character.reach_left = 15;
-        } else if (charcter.facing === 'right') {
-          character.reach_left = 12;
-        } else {
-          throw new Error('where are you facing?');
-        }
-        character.reach_left = 15;
-      } else {
-        character.reach_left = 12;
-      }
-      break;
-    case 'right_a':
-      if (character.onGround) {
-        character.reach_right = 15;
-      } else {
-        
-      }
-      break;
     // Special moves
     // No movement
     default:
-      character.a_x = 0;
-      character.a_y = gravity;
+      character.v_x = 0;
+      character.action = 'stand';
       character.frame += 1;
-      if (character.frame >= 4) {
+      if (character.frame >= 4 * fps) {
         character.frame = 0;
       }
       break;
   }
 
-};
+  // check for collision w\ stage
+  if (character.y > stageHeight) {
+    character.y = stageHeight;
+    character.onGround = true;
+    character.jumps = 2;
+    character.jumpTimeout = 0;
+    character.v_y = 0;
+  }
 
-var updateCharacterMotion = function (characterId) {
-  var character = state.characters[characterId];
-  // Velocity calculation
-  character.v_x += character.a_x * dt;
-  character.v_y += character.a_y * dt;
-  // Characters have a max ground velocity, no max air velocity
-  if (character.onGround) {
-    if (character.v_x > maxGroundSpeed) {
-      character.v_x = maxGroundSpeed;
-    } else if (character.v_x < -maxGroundSpeed) {
-      character.v_x = -maxGroundSpeed;
-    }
-    // v_y cannot be negative on the ground
-    if (character.v_y > 0) {
-      character.v_y = 0;
+  // add gravity if not on the ground
+  if (!character.onGround) {
+    character.v_y += gravity;
+    if (character.jumpTimeout > 0) {
+      character.jumpTimeout -= 1;
     }
   }
+
   // Position calculation
   character.x += character.v_x * dt;
   character.y += character.v_y * dt;
@@ -216,6 +202,7 @@ module.exports = {
     }
     // Detect collision (optional)
     // Detect ground for each char
+    /*
     for (var i = 0; i < numCharacters; i++) {
       character = state.characters[i];
       // if bottom left && bottom right have collided assume ground
@@ -223,14 +210,13 @@ module.exports = {
           stage.hasCollided(character.x+character.width, character.y)) {
         state.characters[i].onGround = true;
         character.v_y = 0;
-        character.a_y = 0;
       } else {
         //state.characters[i].onGround = false;
       }
     }
+    */
 
     for (var i = 0; i < numCharacters; i++) {
-      updateCharacterMotion(i);
       moveQueue[i] = null;
     };
   },
@@ -252,7 +238,7 @@ module.exports = {
           height: ch.height,
           width: ch.width,
 
-          frame: ch.frame,
+          frame: Math.floor(ch.frame / fps),
           action: ch.action
         };
       })

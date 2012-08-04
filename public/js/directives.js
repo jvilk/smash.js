@@ -35,10 +35,15 @@ myDirectives.directive('smashGame', function (socket) {
       name: res
     };
 
-    [{
-      name:'stand',
-      frames: 4
-    }].forEach(function (item) {
+    [
+      {
+        name:'stand',
+        frames: 4
+      }, {
+        name:'run',
+        frames: 4
+      }
+    ].forEach(function (item) {
       ret[item.name] = [];
       var i, num;
       for (i = 1; i <= item.frames; i++) {

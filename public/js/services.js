@@ -42,10 +42,18 @@ myServices.factory('keys', function ($window, socket) {
     DOWN = 40;
 
   var moveType = function () {
-    if (keyState[LEFT]) {
-      return 'left';
+    if (keyState[LEFT] && keyState[UP]) {
+      return 'leftUp';
+    } else if (keyState[LEFT] && keyState[DOWN]) {
+      return 'leftDown';
+    } else if (keyState[RIGHT] && keyState[UP]) {
+      return 'rightUp';
+    } else if (keyState[RIGHT] && keyState[DOWN]) {
+      return 'rightDown';
     } else if (keyState[RIGHT]) {
       return 'right';
+    } else if (keyState[LEFT]) {
+      return 'left';
     } else if (keyState[UP]) {
       return 'up';
     } else if (keyState[DOWN]) {
