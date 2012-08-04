@@ -39,7 +39,8 @@ myServices.factory('keys', function ($window, socket) {
   var LEFT = 37, // arrow keys
     RIGHT = 39,
     UP = 38,
-    DOWN = 40;
+    DOWN = 40,
+    A = 65;
 
   var moveType = function () {
     if (keyState[LEFT] && keyState[UP]) {
@@ -58,6 +59,8 @@ myServices.factory('keys', function ($window, socket) {
       return 'up';
     } else if (keyState[DOWN]) {
       return 'down';
+    } else if (keystate[A]) {
+      return 'attack';
     }
   };
 
