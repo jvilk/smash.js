@@ -218,14 +218,17 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
+      victim.damage += 100;
+      dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
+        victim.damage += 10;
         victim.v_x += dir * neutralGroundAttackHitSpeed;
       } else{
         victim.v_x += dir * neutralAirAttackHitSpeed;
       }
       victim.state = 'stun';
       victim.onGround = false;
-      victim.v_y = -80;
+      victim.v_y = -80 * (1+victim.damage/500);
       victim.damageFrames = 50;
       //console.log(victim)
     }
