@@ -16,6 +16,10 @@ var app = angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.dir
       templateUrl: 'partials/name',
       controller: NameCtrl
     });
+    $routeProvider.when('/instr', {
+      templateUrl: 'partials/instr',
+      controller: function () {}
+    });
     $routeProvider.otherwise({
       redirectTo: '/play'
     });
