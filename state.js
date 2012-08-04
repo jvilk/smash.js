@@ -166,7 +166,7 @@ var runMove = function (characterId) {
 
   // check for collision w\ stage
   // TODO: find dimensions of stage on map
-  if (character.y > stageHeight && x > 200 && x < 1000) {
+  if (character.y > stageHeight && character.x > 200 && character.x < 1000) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
