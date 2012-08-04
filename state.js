@@ -1,4 +1,3 @@
-
 // State Vars
 // ==========
 var state,
@@ -52,7 +51,7 @@ var runMove = function (characterId) {
       if (character.onGround) {
         character.a_y = 5;
       } else {
-        if character.airJumps<=max_air_jumps{
+        if (character.airJumps <= max_air_jumps) {
           character.a_y = 3;
           character.airJumps++;
         }
@@ -73,23 +72,23 @@ var runMove = function (characterId) {
     case 'right_a':
     // Special moves
   }
+};
 
-  var updateCharacterMotion = function (characterId) {
-    var character = state.characters[characterId];
-    var dt = 1/24;
-    // Velocity calculation
-    //Characters have a max ground velocity, no max air velocity
-    if (character.onGround) {
-      character.v_x = min(max_ground_x, character.v_x + character.a_x * dt);
-      character.v_y = max(0, min(max_ground_y, character.v_y + character.a_y * dt));
-    } else {
-      character.v_x += character.a_x * dt;
-      character.v_y += character.a_y * dt;
-    }
-    // Position calculation
-    character.x += character.v_x * dt;
-    character.y += character.v_y * dt;
+var updateCharacterMotion = function (characterId) {
+  var character = state.characters[characterId];
+  var dt = 1/24;
+  // Velocity calculation
+  //Characters have a max ground velocity, no max air velocity
+  if (character.onGround) {
+    character.v_x = Math.min(max_ground_x, character.v_x + character.a_x * dt);
+    character.v_y = Math.max(0, Math.min(max_ground_y, character.v_y + character.a_y * dt));
+  } else {
+    character.v_x += character.a_x * dt;
+    character.v_y += character.a_y * dt;
   }
+  // Position calculation
+  character.x += character.v_x * dt;
+  character.y += character.v_y * dt;
 };
 
 // Public API
@@ -109,11 +108,11 @@ module.exports = {
 
   runFrame: function () {
     // Calculate position using velocity / acceleration
-    for (var i = numCharacters; i++) {
+    for (var i = 0; i < numCharacters; i++) {
       updateCharacterMotion(i);
     }
     // Attacks
-    for (var i = numCharacters; i++) {
+    for (var i = 0; i < numCharacters; i++) {
       //attacks(i);
       //detectHits(i);
     }
