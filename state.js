@@ -21,7 +21,9 @@ var initCharacter = function (characterId) {
     a_y: 0,
     onGround: true,
     airJumps: 0,
-    damage: 0
+    damage: 0,
+    height: 100,
+    width: 30
   };
 };
 
@@ -66,10 +68,15 @@ var runMove = function (characterId) {
       break;
     // Basic attacks
     case 'a':
+      break;
     case 'up_a':
+      break;
     case 'down_a':
+      break;
     case 'left_a':
+      break;
     case 'right_a':
+      break;
     // Special moves
   }
   updateCharacterMotion(characterId);
@@ -122,11 +129,28 @@ module.exports = {
     }
     // Detect collision (optional)
     // Detect ground for each char
+    for (var i = 0; i < numCharacters; i++) {
+      character = state.characters[i];
+      if (hasCollided(character.x, character.y) || hasCollided(character.x+character.width, character.y)){
+        state.characters[i].onGround = true;
+        character.v_y = 0;
+        character.a_y = 0;
+      }
+      // if bottom left && bottom right have collided assume ground
+    }
   },
+
+  detectHits: function(playerId) {
+    x = state.characters[playerId];
+    y = state.characters[playerId];
+
+  },
+
   setMove: function (player, move) {
     console.log(move);
     moveQueue[player] = move;
   },
+
   get: function () {
     return state;
   }
