@@ -27,6 +27,10 @@ var aerialUpReach = 15;
 var groundDownReach = 8;
 var aerialDownReach = 10;
 
+var mapWidth = 720;
+var mapHeight = 1280;
+var deathMargin = 200;
+
 var stageHeight = 390;
 
 //these numbers are random guesses and subject to change
@@ -127,7 +131,8 @@ var initCharacter = function (characterId) {
 };
 
 var attack = function (character) {
-  attackFrames
+  character.attackFrames = 20;
+  character.action = 'attack';
 }
 
 var moveLeft = function (character) {
@@ -173,6 +178,13 @@ var canMove = function (character) {
   return character.damageFrames <= 0 && character.attackFrames <= 0;
 }
 
+var isDead = function (character) {
+  return character.x <= -deathMargin ||
+    character.x > mapWidth + deathMargin ||
+    character.y < -deathMargin ||
+    character.y > mapHeight + deathMargin;
+}
+
 var runMove = function (characterId) {
   var character = state.characters[characterId];
   if (canMove(character)) {
@@ -214,8 +226,15 @@ var runMove = function (characterId) {
       // Special moves
       // No movement
       default:
-        character.v_x = 0;
-        character.action = 'stand';
+        character.v_x = character.v_x / 3;
+        if (character.v_x < 0) {
+          character.v_x = Math.ceil(character.v_x);
+        } else {
+          character.v_x = Math.floor(character.v_x);
+        }
+        if (character.v_x === 0) {
+          character.action = 'stand';
+        }
         break;
     }
   }
@@ -255,12 +274,20 @@ var runMove = function (characterId) {
   character.x += character.v_x * dt;
   character.y += character.v_y * dt;
 
+  if (isDead(character)) {
+    deathHook(characterId);
+    state.characters[characterId] = initCharacter(characterId);
+  }
+
   // animate
   character.frame += 1;
   if (character.frame >= 4 * fps) {
     character.frame = 0;
   }
 };
+
+// noop by default
+var deathHook = function () {};
 
 // Public API
 // ==========
@@ -342,5 +369,8 @@ module.exports = {
       maxGroundSpeed: maxGroundSpeed,
       maxAirJumps : maxAirJumps
     }
+  },
+  onDie: function (fn) {
+    deathHook = fn;
   }
 };
