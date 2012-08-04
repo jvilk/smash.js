@@ -67,15 +67,23 @@ var runMove = function (characterId) {
       if (character.onGround) {
         character.a_y = 5;
       } else {
-        if (character.airJumps <= maxAirJumps) {
+        if (character.airJumps < maxAirJumps) {
           character.a_y = 3;
           character.airJumps++;
+        }
+        else{
+          character.a_x = 0;
+          character.a_y = gravity;
         }
       }
       break;
     case 'down':
       if (!character.onGround) {
-        character.a_y = -5;
+        character.a_y = -5 + gravity;
+      }
+      else{
+          character.a_x = 0;
+          character.a_y = gravity;
       }
       break;
     // Basic attacks
@@ -180,7 +188,9 @@ module.exports = {
       gravity: gravity,
       dt: dt,
       spawnSpacing: spawnSpacing,
-      spawnHeight: spawnHeight
+      spawnHeight: spawnHeight,
+      maxGroundSpeed: maxGroundSpeed,
+      maxAirJumps : maxAirJumps
     }
   }
 };
