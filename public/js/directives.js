@@ -58,7 +58,7 @@ myDirectives.directive('smashGame', function (socket) {
     return ret;
   });
 
-  var mapImg = makeImg('final-destination.png');
+  var mapImg = makeImg('bg.png');
 
   var canvasWidth = 1280,
     canvasHeight = 720;
