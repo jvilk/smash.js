@@ -109,7 +109,7 @@ myDirectives.directive('smashGame', function (socket) {
         // Draw Character Portraits
         characters.forEach(function (ch, i) {
 
-          var x = canvasWidth * (i + 1)/(characters.length + 1),
+          var x = canvasWidth * (i + 0.82)/(characters.length + 1),
             y = canvasHeight * (4 / 5);
 
           // draw character portrait
