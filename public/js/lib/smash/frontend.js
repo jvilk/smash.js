@@ -57,6 +57,29 @@ function main() {
 function refresh(elt, characters) {
   var canvas = $(elt).clearCanvas();
 
+  var charResources = [
+    {
+      portrait: "link-sprite",
+      sprite: "link-character",
+      name: "Link"
+    },
+    {
+      portrait: "link-sprite",
+      sprite: "link-character",
+      name: "Kirby"
+    },
+    {
+      portrait: "link-sprite",
+      sprite: "link-character",
+      name: "Fox"
+    },
+    {
+      portrait: "link-sprite",
+      sprite: "link-character",
+      name: "JigglyPuff"
+    },
+  ];
+
   // draw background
   canvas.drawImage({
     source: $("#final-destination")[0],
@@ -76,8 +99,10 @@ function refresh(elt, characters) {
   /////////////////////////// Draw Characters ////////////////////////////////////
   $.each(characters, function(i, character) {
     // draw character image
+    var charResource = charResources[i];
+
     canvas.drawImage({
-      source: $('#' + character.sprite)[0],
+      source: $('#' + charResource.sprite)[0],
       x: character.x,
       y: character.y,
       width: character.width,
@@ -99,6 +124,8 @@ function refresh(elt, characters) {
         iconHeight = canvas.height() * (1.0/6.0),
         iconWidth = canvas.width() * (1.0/8.0);
 
+    var charResource = charResources[i];
+
     // Bounding box for portrait, name, etc
     //canvas.drawRect({
     //  x: x,
@@ -113,7 +140,7 @@ function refresh(elt, characters) {
     canvas.drawText({
       x: x,
       y: y + iconHeight/2.0 - fontSize/2.0,
-      text: character.name,
+      text: charResource.name,
       align: 'center',
       font: fontSize + "px Arial",
       fillStyle: "#FFF"
@@ -124,7 +151,7 @@ function refresh(elt, characters) {
         portraitHeight = iconWidth * 2.0/4.0;
 
     canvas.drawImage({
-      source: $('#' + character.portrait)[0],
+      source: $('#' + charResource.portrait)[0],
       x: x - iconWidth/2.0 + portraitWidth/2.0,
       y: y - iconHeight/2.0 + portraitHeight/2.0,
       width: portraitWidth,

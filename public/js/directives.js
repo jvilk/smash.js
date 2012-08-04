@@ -20,6 +20,9 @@ myDirectives.directive('smashGame', function (socket) {
     link: function(scope, elm, attrs) {
       var canvas = angular.element('<canvas width="1280" height="720"></canvas>');
       elm.append(canvas);
+      elm.append('<div class="hide"><img id="final-destination" src="images/final-destination.png">' +
+        '<img id="link-sprite" src="images/link/sprite.gif">' +
+        '<img id="link-character" src="images/link/character.gif"></div>');
 
       socket.on('send:state', function (state) {
         refresh(canvas[0], state.characters);
