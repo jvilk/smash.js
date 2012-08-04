@@ -1,11 +1,11 @@
-//$(document).ready(main);
+// $(document).ready(main);
 
 function main() {
   prefetchImages(['link', 'kirby', 'asshole']);
   var characters = [
     {
-      portrait: "images/link/sprite.gif",
-      character: "images/link/character.gif",
+      portrait: "link-sprite",
+      sprite: "link-character",
       x: 100,
       y: 100,
       width: 100,
@@ -14,8 +14,8 @@ function main() {
       name: "Link"
     },
     {
-      portrait: "images/link/sprite.gif",
-      character: "images/link/character.gif",
+      portrait: "link-sprite",
+      sprite: "link-character",
       x: 200,
       y: 200,
       width: 120,
@@ -24,8 +24,8 @@ function main() {
       name: "Kirby"
     },
     {
-      portrait: "images/link/sprite.gif",
-      character: "images/link/character.gif",
+      portrait: "link-sprite",
+      sprite: "link-character",
       x: 600,
       y: 300,
       width: 100,
@@ -34,8 +34,8 @@ function main() {
       name: "Fox"
     },
     {
-      portrait: "images/link/sprite.gif",
-      character: "images/link/character.gif",
+      portrait: "link-sprite",
+      sprite: "link-character",
       x: 1000,
       y: 400,
       width: 200,
@@ -44,41 +44,70 @@ function main() {
       name: "JigglyPuff"
     },
   ];
-  refresh(characters);
+
+  // initialize refresh loop
+  setInterval(function() {
+    $.each(characters, function(i, char) {
+      char.x += 10*(Math.random() - 0.5);
+      char.y += 10*(Math.random() - 0.5);
+    });
+    refresh($("#game"), characters);
+  }, 1000/60);
 }
 
 function refresh(elt, characters) {
   var canvas = $(elt).clearCanvas();
 
   // draw background
-  //canvas.drawImage({
-  //  source: "images/final-destination.png",
-  //  x: canvas.width()/2,
-  //  y: canvas.height()/2,
-  //  width: canvas.width(),
-  //  height: canvas.height(),
-  //});
-  canvas.drawRect({
+  canvas.drawImage({
+    source: $("#final-destination")[0],
     x: canvas.width()/2,
     y: canvas.height()/2,
     width: canvas.width(),
     height: canvas.height(),
-    fillStyle: "#EEE"
   });
+  //canvas.drawRect({
+  //  x: canvas.width()/2,
+  //  y: canvas.height()/2,
+  //  width: canvas.width(),
+  //  height: canvas.height(),
+  //  fillStyle: "#EEE"
+  //});
 
+  /////////////////////////// Draw Characters ////////////////////////////////////
+  $.each(characters, function(i, character) {
+    // draw character image
+    canvas.drawImage({
+      source: $('#' + character.sprite)[0],
+      x: character.x,
+      y: character.y,
+      width: character.width,
+      height: character.height,
+    });
+    //canvas.drawRect({
+    //  x: character.x,
+    //  y: character.y,
+    //  width: character.width,
+    //  height: character.height,
+    //  fillStyle: "#00F"
+    //});
+  })
+
+  /////////////////////////// Draw Character Portraits ///////////////////////////
   $.each(characters, function(i, character) {
     var x = canvas.width() * (1.0 + i)/(1.0 + characters.length),
         y = canvas.height() * (1.0 - 1.0/5.0),
         iconHeight = canvas.height() * (1.0/6.0),
         iconWidth = canvas.width() * (1.0/8.0);
 
-    canvas.drawRect({
-      x: x,
-      y: y,
-      width: iconWidth,
-      height: iconHeight,
-      fillStyle: "#000"
-    });
+    // Bounding box for portrait, name, etc
+    //canvas.drawRect({
+    //  x: x,
+    //  y: y,
+    //  width: iconWidth,
+    //  height: iconHeight,
+    //  fillStyle: "#000"
+    //});
 
     // draw character names
     var fontSize = iconHeight * 1.0/5.0;
@@ -95,13 +124,20 @@ function refresh(elt, characters) {
     var portraitWidth = iconHeight * 3.0/5.0,
         portraitHeight = iconWidth * 2.0/4.0;
 
-    canvas.drawRect({
+    canvas.drawImage({
+      source: $('#' + character.portrait)[0],
       x: x - iconWidth/2.0 + portraitWidth/2.0,
       y: y - iconHeight/2.0 + portraitHeight/2.0,
       width: portraitWidth,
       height: portraitHeight,
-      fillStyle: "#F00"
     });
+    //canvas.drawRect({
+    //  x: x - iconWidth/2.0 + portraitWidth/2.0,
+    //  y: y - iconHeight/2.0 + portraitHeight/2.0,
+    //  width: portraitWidth,
+    //  height: portraitHeight,
+    //  fillStyle: "#F00"
+    //});
 
     // draw character damage
     fontSize = iconHeight * 3.0/5.0;
@@ -114,14 +150,6 @@ function refresh(elt, characters) {
       fillStyle: "#FFF"
     });
 
-    // draw character image
-    canvas.drawRect({
-      x: character.x,
-      y: character.y,
-      width: character.width,
-      height: character.height,
-      fillStyle: "#00F"
-    });
   })
 }
 

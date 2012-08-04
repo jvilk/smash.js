@@ -775,8 +775,12 @@ $.fn.drawImage = function self(args) {
 	imgCtx = params.source.getContext;
 	if (params.source.src || imgCtx) {
 		img = params.source;
-		params.width = img.width;
-		params.height = img.height;
+    if (!params.width) {
+		  params.width = img.width;
+    }
+    if (!params.height) {
+		  params.height = img.height;
+    }
 	} else if (params.source) {
 		img = new Image();
 		img.src = params.source;
