@@ -28,10 +28,6 @@ var initCharacter = function (characterId) {
 var runMove = function (characterId) {
   var character = state.characters[characterId];
   switch (moveQueue[characterId]) {
-    case 'none':
-      character.a_x = 0;
-      character.a_y = gravity;
-      break;
     // Basic movement
     case 'left':
       if (character.onGround) {
@@ -71,6 +67,10 @@ var runMove = function (characterId) {
     case 'left_a':
     case 'right_a':
     // Special moves
+    default:
+      character.a_x = 0;
+      character.a_y = gravity;
+      break;
   }
   updateCharacterMotion(characterId);
 
