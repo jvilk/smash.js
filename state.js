@@ -48,6 +48,9 @@ module.exports = {
       runMove(i);
     }
   },
+  setMove: function (player, move) {
+    moveQueue[player] = move;
+  },
   get: function () {
     return state;
   }
