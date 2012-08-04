@@ -36,24 +36,32 @@ myServices.factory('socket', function ($rootScope) {
 // TODO: enable/disable??
 myServices.factory('keys', function ($window, socket) {
 
-  var LEFT = 37, // left key
-    RIGHT = 39; // right key
+  var LEFT = 37, // arrow keys
+    RIGHT = 39,
+    UP = 38,
+    DOWN = 40;
 
   var moveType = function () {
     if (keyState[LEFT]) {
       return 'left';
     } else if (keyState[RIGHT]) {
       return 'right';
+    } else if (keyState[UP]) {
+      return 'up';
+    } else if (keyState[DOWN]) {
+      return 'down';
     }
   };
 
   var keyState = {};
 
   $window.addEventListener('keydown', function (ev) {
+    ev.preventDefault();
     keyState[ev.keyCode] = true;
   });
   
   $window.addEventListener('keyup', function (ev) {
+    ev.preventDefault();
     delete keyState[ev.keyCode];
   });
 
