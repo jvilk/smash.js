@@ -1,5 +1,11 @@
 smash-game.span11
 .span1
+  h4 Currently Playing
+  ol
+    li(ng-repeat="user in players") {{user.name}}
   h4 Player Queue
-  ul
-    li(ng-repeat="user in users") {{user}}
+  ol
+    li(ng-repeat="user in queue") {{user.name}}
+  h4 Leader Board
+  ol
+    li(ng-repeat="user in leaders") {{user.name}}: {{user.kills}}

@@ -20,14 +20,18 @@ myServices.factory('socket', function ($rootScope) {
         });
       });
     },
+    // does not $apply for great performance
+    quietOn: function (eventName, callback) {
+      socket.on(eventName, callback);
+    },
     emit: function (eventName, data, callback) {
       socket.emit(eventName, data, function () {
         var args = arguments;
-        $rootScope.$apply(function () {
-          if (callback) {
+        if (callback) {
+          $rootScope.$apply(function () {
             callback.apply(socket, args);
-          }
-        });
+          });
+        }
       })
     }
   };
@@ -94,13 +98,22 @@ myServices.factory('keys', function ($window, socket) {
   return {
     enable: function () {
       if (enabled) {
+        $('input').focus(function () {
+          $window.removeEventListener('keydown', registerKeyDown);
+          $window.removeEventListener('keyup', registerKeyUp);
+        });
+        
+        $('input').blur(function () {    
+          $window.addEventListener('keydown', registerKeyDown);
+          $window.addEventListener('keyup', registerKeyUp);
+        });
         return;
       }
       enabled = true;
 
       setInterval(function () {
         socket.emit('submit:move', moveType());
-      }, 30);      
+      }, 30);
     }
   };
 

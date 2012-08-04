@@ -24,6 +24,16 @@ var getSpot = function () {
   return false;
 };
 
+var characterToPlayer = [];
+characterToPlayer.length = numPlayers;
+
+var sendPlayers = function () {
+  sockets.emit('send:players', {
+    players: characterToPlayer,
+    queue: playQueue
+  });
+}
+
 var resetSpots = function (num) {
   spots.length = num;
   var i;
@@ -34,18 +44,22 @@ var resetSpots = function (num) {
 
 var freeSpot = function (num) {
   spots[num] = true;
+  characterToPlayer[num] = null;
+  sendPlayers();
 };
 
 var playQueue = [];
 
 var giveSomeoneMySpot = function (me) {
-if (playQueue.length > 0) {
+  if (playQueue.length > 0) {
     next = playQueue.shift();
     next.id = me.id;
     me.id = false;
+    characterToPlayer[next.id] = next.data;
   } else {
     freeSpot(me.id);
   }
+  sendPlayers();
 }
 
 var removeMeFromTheQueue = function (me) {
@@ -56,7 +70,60 @@ var removeMeFromTheQueue = function (me) {
       return;
     }
   }
+  sendPlayers();
 }
+
+// Registering user name
+// =====================
+// Keep track of which names are used so that there are no duplicates
+var userNames = (function () {
+  var names = {};
+
+  var claim = function (name) {
+    if (!name || names[name]) {
+      return false;
+    } else {
+      names[name] = true;
+      return true;
+    }
+  };
+
+  // find the lowest unused "guest" name and claim it
+  var getGuestName = function () {
+    var name,
+      nextUserId = 1;
+
+    do {
+      name = 'Guest ' + nextUserId;
+      nextUserId += 1;
+    } while (!claim(name));
+
+    return name;
+  };
+
+  // serialize claimed names as an array
+  var get = function () {
+    var res = [];
+    for (user in names) {
+      res.push(user);
+    }
+
+    return res;
+  };
+
+  var free = function (name) {
+    if (names[name]) {
+      delete names[name];
+    }
+  };
+
+  return {
+    claim: claim,
+    free: free,
+    get: get,
+    getGuestName: getGuestName
+  };
+}());
 
 module.exports = {
   init: function (s) {
@@ -71,14 +138,49 @@ module.exports = {
   connect: function (socket) {
     var me = {
       id: getSpot(),
-      name: Math.random()
+      data: {
+        name: userNames.getGuestName()
+      }
     };
+
+    // send the new user their name and a list of users
+    socket.emit('init', {
+      name: me.data.name,
+      users: userNames.get()
+    });
+
+    // notify other clients that a new user has joined
+    socket.broadcast.emit('user:join', {
+      name: me.data.name
+    });
+
+    // validate a user's name change, and broadcast it on success
+    socket.on('change:name', function (data, fn) {
+      if (userNames.claim(data.name)) {
+        var oldName = me.data.name;
+        userNames.free(oldName);
+
+        me.data.name = data.name;
+        
+        socket.broadcast.emit('change:name', {
+          oldName: oldName,
+          newName: me.data.name
+        });
+
+        sendPlayers();
+
+        fn(true);
+      } else {
+        fn(false);
+      }
+    });
 
     if (typeof me.id !== 'number') {
       playQueue.push(me);
+    } else {
+      characterToPlayer[me.id] = me.data;
     }
-
-    require('./userNames')(socket);
+    sendPlayers();
 
     socket.on('submit:move', function (move) {
       if (typeof me.id === 'number') {
@@ -93,6 +195,12 @@ module.exports = {
         removeMeFromTheQueue(me);
       }
       state.removeOnDie(deathListener);
+
+      // clean up when a user leaves, and broadcast it to other users
+      socket.broadcast.emit('user:left', {
+        name: me.data.name
+      });
+      userNames.free(me.data.name);
     });
 
     function deathListener (playerId) {
