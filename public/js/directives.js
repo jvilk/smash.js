@@ -45,6 +45,9 @@ myDirectives.directive('smashGame', function (socket) {
       }, {
         name:'attack',
         frames: 4
+      }, {
+        name:'stun',
+        frames: 4
       }
     ].forEach(function (item) {
       ret[item.name] = [];

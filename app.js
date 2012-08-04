@@ -11,6 +11,7 @@ var app = module.exports = express.createServer();
 
 // Hook Socket.io into Express
 var io = require('socket.io').listen(app);
+io.set('log level', 0);
 
 // Configuration
 

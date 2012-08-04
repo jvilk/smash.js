@@ -190,8 +190,7 @@ var neutralAttack = function (character) {
     if (character.facing === 'left'){
       character.reach_left = groundNeutralReach;
     }
-  }
-  else{
+  } else {
     if (character.facing === 'right'){
       character.reach_right = aerialNeutralReach;      
     }
@@ -209,28 +208,26 @@ var neutralAttack = function (character) {
 };
 
 var neutralAttackCollision = function(attacker, victim) {
-  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
+  //console.log(attacker, victim);
+  if (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height)) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
-
     }
     if ((attacker.facing === 'right') && (victim.x).between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
-      dir = +1;
+      dir = 1;
     }
-    if(dir != 0){
-      if(attacker.onGround){
+    if (dir !== 0) {
+      if (attacker.onGround) {
         victim.v_x += dir * neutralGroundAttackHitSpeed;
-      }
-      else{
+      } else{
         victim.v_x += dir * neutralAirAttackHitSpeed;
       }
-      if (dir === 1){
-        victim.state = 'hitRight';
-      }
-      if (dir === -1){
-        victim.state = 'hitLeft';
-      }
+      victim.state = 'stun';
+      victim.onGround = false;
+      victim.v_y = -80;
+      victim.damageFrames = 50;
+      //console.log(victim)
     }
   }
 };
@@ -242,9 +239,7 @@ var leftAttackCollision = function(attacker, victim){
       var dir = -1;
       if(attacker.onGround){
         victim.v_x+= dir * leftGroundAttackHitSpeed;
-      }
-    
-      else{
+      } else {
         if (attacker.facing === 'left'){
           victim.v_x += dir * airFrontAttackHitSpeed;
         }
@@ -399,6 +394,9 @@ var runMove = function (characterId) {
         }
         break;
     }
+  } else if (character.damageFrames > 0) {
+    character.action = 'stun';
+    character.frame = 0;
   }
 
   // check for collision w\ stage
@@ -446,9 +444,11 @@ var runMove = function (characterId) {
   }
 
   // animate
-  character.frame += 1;
-  if (character.frame >= 4 * fps) {
-    character.frame = 0;
+  if (character.damageFrames <= 0) {
+    character.frame += 1;
+    if (character.frame >= 4 * fps) {
+      character.frame = 0;
+    }
   }
 };
 
