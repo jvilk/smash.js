@@ -49,6 +49,8 @@ module.exports = {
   connect: function (socket) {
     var myId = getSpot();
 
+    require('./userNames')(socket);
+
     if (typeof myId === 'number') {
       socket.on('submit:move', function (move) {
         // assume the move is legit

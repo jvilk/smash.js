@@ -55,18 +55,38 @@ myServices.factory('keys', function ($window, socket) {
 
   var keyState = {};
 
-  $window.addEventListener('keydown', function (ev) {
+  function registerKeyDown (ev) {
     ev.preventDefault();
     keyState[ev.keyCode] = true;
-  });
-  
-  $window.addEventListener('keyup', function (ev) {
+  }
+
+  function registerKeyUp (ev) {
     ev.preventDefault();
     delete keyState[ev.keyCode];
+  }
+
+  $('input').focus(function () {
+    $window.removeEventListener('keydown', registerKeyDown);
+    $window.removeEventListener('keyup', registerKeyUp);
   });
+  
+  $('input').blur(function () {    
+    $window.addEventListener('keydown', registerKeyDown);
+    $window.addEventListener('keyup', registerKeyUp);
+  });
+
+  $window.addEventListener('keydown', registerKeyDown);
+  $window.addEventListener('keyup', registerKeyUp);
+
+  var enabled = false;
 
   return {
     enable: function () {
+      if (enabled) {
+        return;
+      }
+      enabled = true;
+
       setInterval(function () {
         socket.emit('submit:move', moveType());
       }, 30);      

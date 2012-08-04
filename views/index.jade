@@ -5,15 +5,19 @@ block body
     h2 Hello {{name}}
     ul.menu
       li
-        a(href='view1') view1
+        a(href='play') Play!
       li
-        a(href='view2') view2
+        a(href='debug') Debug
 
     .row(ng-view)
 
     .row
-      | Angular Socket.io seed app: v
-      span(app-version)
+      .span12
+        h3 Change your name
+        p Your current user name is {{name}}
+        form(ng-submit='changeName()')
+          input(ng-model='newName')
+          input(type='submit', value='Change Name')
 
   script(src='js/lib/jquery-1.7.2.js')
   script(src='js/lib/angular/angular.js')
