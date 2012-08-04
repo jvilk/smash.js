@@ -1,6 +1,6 @@
 // Imports
 // =======
-var stage = require('./stage');
+var stage = require('./stage.js');
 
 // State Vars
 // ==========
@@ -13,13 +13,15 @@ var max_ground_y = 50;
 var gravity = -5;
 var max_air_jumps = 1;
 var dt = 1/24;
+var spawnSpacing = 50;
+var spawnHeight = 10;
 
 // Private Helpers
 // ===============
 var initCharacter = function (characterId) {
   return {
-    x: characterId * 50,
-    y: 10,
+    x: characterId * spawnSpacing,
+    y: spawnHeight,
     v_x: 0,
     v_y: 0,
     a_x: 0,
@@ -160,7 +162,9 @@ module.exports = {
   getConfig: function () {
     return {
       gravity: gravity,
-      dt: dt
+      dt: dt,
+      spawnSpacing: spawnSpacing,
+      spawnHeight: spawnHeight
     }
   }
 };
