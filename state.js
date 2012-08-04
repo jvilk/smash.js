@@ -9,7 +9,7 @@ var state,
 // Num players
 var numCharacters = 1;
 // World state
-var gravity = 5;
+var gravity = 0;
 var dt = 1/24;
 var spawnSpacing = 50;
 var spawnHeight = 10;
