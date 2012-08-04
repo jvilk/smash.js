@@ -72,6 +72,9 @@ var runMove = function (characterId) {
     case 'right_a':
     // Special moves
   }
+  updateCharacterMotion(characterId);
+
+  moveQueue[characterId] = null;
 };
 
 var updateCharacterMotion = function (characterId) {
@@ -90,8 +93,6 @@ var updateCharacterMotion = function (characterId) {
   // Position calculation
   character.x += character.v_x * dt;
   character.y += character.v_y * dt;
-
-  moveQueue[characterId] = null;
 };
 
 // Public API
@@ -112,7 +113,7 @@ module.exports = {
   runFrame: function () {
     // Calculate position using velocity / acceleration
     for (var i = 0; i < numCharacters; i++) {
-      updateCharacterMotion(i);
+      runMove(i);
     }
     // Attacks
     for (var i = 0; i < numCharacters; i++) {
@@ -123,6 +124,7 @@ module.exports = {
     // Detect ground for each char
   },
   setMove: function (player, move) {
+    console.log(move);
     moveQueue[player] = move;
   },
   get: function () {
