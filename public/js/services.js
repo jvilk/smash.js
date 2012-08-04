@@ -59,7 +59,7 @@ myServices.factory('keys', function ($window, socket) {
       return 'up';
     } else if (keyState[DOWN]) {
       return 'down';
-    } else if (keystate[A]) {
+    } else if (keyState[A]) {
       return 'attack';
     }
   };
