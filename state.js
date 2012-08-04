@@ -456,7 +456,7 @@ var runMove = function (characterId) {
 
   if (character.damageFrames > 0) {
     character.damageFrames -= 1;
-    if (character.damageFrames === 0) {
+    if (character.damageFrames <= 2) {
       character.action = 'stand'
     }
   }
