@@ -435,6 +435,9 @@ var runMove = function (characterId) {
 
   if (character.damageFrames > 0) {
     character.damageFrames -= 1;
+    if (character.damageFrames === 0) {
+      character.action = 'stand'
+    }
   }
 
   // Position calculation
@@ -524,7 +527,8 @@ module.exports = {
           frame: Math.floor(ch.frame / fps),
           action: ch.action,
 
-          facing: ch.facing
+          facing: ch.facing,
+          damage: ch.damage
         };
       })
     };
