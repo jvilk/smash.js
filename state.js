@@ -6,6 +6,9 @@ Number.prototype.between = function(first,last){
     return (first < last ? this >= first && this <= last : this >= last && this <= first);
 }
 
+function randOrd(){
+return (Math.round(Math.random())-0.5); }
+
 
 // State Vars
 // ==========
@@ -199,9 +202,14 @@ var neutralAttack = function (character) {
     }
 
   }
+  var charAttackOrder = []
   for (var i = characters.length - 1; i >= 0; i--) {
-    if (character !== characters[i]) {
-      neutralAttackCollision(character, characters[i]);
+    charAttackOrder.push(i);
+  }
+  charAttackOrder.sort(randOrd);
+  for (var i = characters.length - 1; i >= 0; i--) {
+    if (character !== characters[charAttackOrder[i]]) {
+      neutralAttackCollision(character, characters[charAttackOrder[i]]);
     }
   }
   character.action = 'attack';
@@ -218,12 +226,14 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
-      victim.damage += 100;
+      victim.airJumps = 0;
       dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
-        victim.damage += 10;
+        victim.damage += 50;
         victim.v_x += dir * neutralGroundAttackHitSpeed;
       } else{
+        victim.damage += 100;
+
         victim.v_x += dir * neutralAirAttackHitSpeed;
       }
       victim.state = 'stun';
@@ -312,7 +322,7 @@ var moveUp = function (character) {
     if (character.onGround) {
       character.v_y = -120;
     } else {
-      character.v_y -= 80;
+      character.v_y = -80;
     }
   }
 };
@@ -403,7 +413,7 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight && (character.y - character.v_y*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
+  if (character.y > stageHeight && (character.y - character.v_y*6*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
