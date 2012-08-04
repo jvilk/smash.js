@@ -77,6 +77,7 @@ var moveLeft = function (character) {
     character.v_x = -50;
   }
   character.action = 'run';
+  character.facing = 'left';
 };
 
 var moveRight = function (character) {
@@ -86,6 +87,7 @@ var moveRight = function (character) {
     character.v_x = 50;
   }
   character.action = 'run';
+  character.facing = 'right';
 };
 
 var moveUp = function (character) {
@@ -146,10 +148,6 @@ var runMove = function (characterId) {
     default:
       character.v_x = 0;
       character.action = 'stand';
-      character.frame += 1;
-      if (character.frame >= 4 * fps) {
-        character.frame = 0;
-      }
       break;
   }
 
@@ -173,6 +171,12 @@ var runMove = function (characterId) {
   // Position calculation
   character.x += character.v_x * dt;
   character.y += character.v_y * dt;
+
+  // animate
+  character.frame += 1;
+  if (character.frame >= 4 * fps) {
+    character.frame = 0;
+  }
 };
 
 // Public API
@@ -239,7 +243,9 @@ module.exports = {
           width: ch.width,
 
           frame: Math.floor(ch.frame / fps),
-          action: ch.action
+          action: ch.action,
+
+          facing: ch.facing
         };
       })
     };

@@ -92,11 +92,16 @@ myDirectives.directive('smashGame', function (socket) {
         // Draw Characters
         characters.forEach(function (ch, i) {
           var charResource = charResources[i];
+
+          /*
+          if (ch.facing === 'left') {}
+          */
           ctx.drawImage(
             charResource[ch.action][ch.frame],
             ch.x,
             ch.y
           );
+
         });
 
         ctx.fillStyle = "#FFF";
@@ -114,11 +119,6 @@ myDirectives.directive('smashGame', function (socket) {
           // draw character names
           // ====================
 
-          // set font style
-          var fontSize = iconHeight / 5;
-          ctx.font = fontSize + "px Arial";
-          ctx.align = 'center';
-
           ctx.drawImage(
             charResource.portrait,
             x,
@@ -126,6 +126,11 @@ myDirectives.directive('smashGame', function (socket) {
             portraitWidth,
             portraitHeight
           );
+
+          // set font style
+          var fontSize = iconHeight / 5;
+          ctx.font = fontSize + "px Arial";
+          ctx.align = 'center';
 
           ctx.fillText(
             charResource.name,
