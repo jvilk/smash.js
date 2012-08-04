@@ -1,3 +1,7 @@
+// Imports
+// =======
+var stage = require('./stage');
+
 // State Vars
 // ==========
 var state,
@@ -30,10 +34,6 @@ var initCharacter = function (characterId) {
 var runMove = function (characterId) {
   var character = state.characters[characterId];
   switch (moveQueue[characterId]) {
-    case 'none':
-      character.a_x = 0;
-      character.a_y = gravity;
-      break;
     // Basic movement
     case 'left':
       if (character.onGround) {
@@ -78,10 +78,13 @@ var runMove = function (characterId) {
     case 'right_a':
       break;
     // Special moves
-  }
-  updateCharacterMotion(characterId);
 
-  moveQueue[characterId] = null;
+    // No movement
+    default:
+      character.a_x = 0;
+      character.a_y = gravity;
+      break;
+  }
 };
 
 var updateCharacterMotion = function (characterId) {
@@ -131,19 +134,20 @@ module.exports = {
     // Detect ground for each char
     for (var i = 0; i < numCharacters; i++) {
       character = state.characters[i];
-      if (hasCollided(character.x, character.y) || hasCollided(character.x+character.width, character.y)){
+      // if bottom left && bottom right have collided assume ground
+      if (stage.hasCollided(character.x, character.y) || stage.hasCollided(character.x+character.width, character.y)){
         state.characters[i].onGround = true;
         character.v_y = 0;
         character.a_y = 0;
       }
-      // if bottom left && bottom right have collided assume ground
+      updateCharacterMotion(i);
+      moveQueue[i] = null;
     }
   },
 
   detectHits: function(playerId) {
     x = state.characters[playerId];
     y = state.characters[playerId];
-
   },
 
   setMove: function (player, move) {
