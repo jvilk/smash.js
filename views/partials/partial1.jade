@@ -1,5 +1,9 @@
-smash-game
+smash-game.span11
+.span1
+  h4 Player Queue
+  ul
+    li(ng-repeat="player in players") {{player}}
+
 //-
-  pre {{state | json}}
-  button(ng-click='left()') Left
-  button(ng-click='right()') Right
+  .span12
+    pre {{state | json}}
