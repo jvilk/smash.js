@@ -71,7 +71,7 @@ var initCharacter = function (characterId) {
 };
 
 var attack = function (character) {
-  attackFrames
+  console.log(character);
 }
 
 var moveLeft = function (character) {
@@ -124,7 +124,6 @@ var runMove = function (characterId) {
       // Basic movement
       case 'left':
         moveLeft(character);
-        
         break;
       case 'right':
         moveRight(character);
@@ -166,7 +165,7 @@ var runMove = function (characterId) {
 
   // check for collision w\ stage
   // TODO: find dimensions of stage on map
-  if (character.y > stageHeight && character.x > 200 && character.x < 1000) {
+  if (character.y > stageHeight && character.x > 200 && character.x < 1010) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = 2;
@@ -180,7 +179,11 @@ var runMove = function (characterId) {
     if (character.jumpTimeout > 0) {
       character.jumpTimeout -= 1;
     }
+  } else if(character.x < 200 || character.x > 1010) {
+    character.onGround = false;
   }
+
+
 
   if (character.attackFrames > 0) {
     character.attackFrames -= 1;
