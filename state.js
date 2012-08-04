@@ -26,7 +26,7 @@ var mapWidth = 1280;
 var mapHeight = 720;
 var deathMargin = 200;
 
-var stageHeight = 390;
+var stageHeight = 378;
 
 //these numbers are random guesses and subject to change
 var stageLeft = 1010;
