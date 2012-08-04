@@ -10,7 +10,6 @@ Number.prototype.between = function(first,last){
 function randOrd(){
 return (Math.round(Math.random())-0.5); }
 
-
 // State Vars
 // ==========
 var state,
@@ -50,8 +49,8 @@ var characterArray = {}
 var initCharacters = function(){
   return [
     characterArray.link = {
-      height : 100,
-      width : 30,
+      height : 92,
+      width : 72,
       maxAirJumps : 2,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
@@ -70,8 +69,8 @@ var initCharacters = function(){
       neutralAttackFrames: 20,
     },
     characterArray.kirby = {
-      height : 100,
-      width : 30,
+      height : 94,
+      width : 72,
       maxAirJumps : 10,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
@@ -90,8 +89,8 @@ var initCharacters = function(){
       neutralAttackFrames: 20,
     },
     characterArray.captainfalcon = {
-      height : 100,
-      width : 30,
+      height : 94,
+      width : 72,
       maxAirJumps : 1,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
@@ -144,6 +143,7 @@ var initCharacter = function (characterId) {
     // vars for animation
     frame: 0,
     action: 'stand',
+
 
     // state variables
     attackFrames: 0,
@@ -506,8 +506,14 @@ module.exports = {
   // Update frame using latest actions
   runFrame: function () {
     // Process moves
+    var priorityQueue = []
+    for (var i = 0; i < numCharacters; i++){
+      priorityQueue[i] = i;
+    }
+
+    priorityQueue.sort(randOrd)
     for (var i = 0; i < numCharacters; i++) {
-      runMove(i);
+      runMove(priorityQueue[i]);
     }
     // Process hits
     for (var i = 0; i < numCharacters; i++) {
@@ -536,6 +542,7 @@ module.exports = {
 
   setMove: function (player, move) {
     moveQueue[player] = move;
+
   },
 
   get: function () {
