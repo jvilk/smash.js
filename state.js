@@ -158,6 +158,7 @@ var leftAttack = function (character){
 }
 
 var rightAttack = function (character){
+  var characters = state.characters;
   character.attackFrames = 20;
   if(character.onGround){
     character.facing = 'right';
@@ -180,6 +181,7 @@ var rightAttack = function (character){
 }
 
 var neutralAttack = function (character) {
+  var characters = state.characters;
   character.attackFrames = neutralAttackFrames;
   if (character.onGround){
     if (character.facing === 'right'){
@@ -207,13 +209,13 @@ var neutralAttack = function (character) {
 };
 
 var neutralAttackCollision = function(attacker, victim) {
-  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
     var dir = 0;
-    if ((attacker.facing === 'left') && (victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
+    if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
 
     }
-    if ((attacker.facing === 'right') && (victim.x).isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
+    if ((attacker.facing === 'right') && (victim.x).between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
       dir = +1;
     }
     if(dir != 0){
@@ -234,9 +236,9 @@ var neutralAttackCollision = function(attacker, victim) {
 };
 
 var leftAttackCollision = function(attacker, victim){
-  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
     var dir = 0;
-    if ((victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
+    if ((victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       var dir = -1;
       if(attacker.onGround){
         victim.v_x+= dir * leftGroundAttackHitSpeed;
@@ -255,9 +257,9 @@ var leftAttackCollision = function(attacker, victim){
 }
 
 var rightAttackCollision = function(attacker, victim){
-  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
     var dir = 0;
-    if (victim.x.isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
+    if (victim.x.between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
       dir = 1;
       if(attacker.onGround){
         victim.v_x+= dir * leftGroundAttackHitSpeed;
@@ -432,7 +434,7 @@ var runMove = function (characterId) {
 
   if (character.attackFrames > 0) {
     character.attackFrames -= 1;
-    if (attackFrames === 0) {
+    if (character.attackFrames === 0) {
       character.reach_left = 0;
       character.reach_right = 0;
       character.reach_bottom = 0;
