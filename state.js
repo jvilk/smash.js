@@ -445,8 +445,14 @@ var runMove = function (characterId) {
   character.y += character.v_y * dt;
 
   if (isDead(character)) {
-    deathHook(characterId);
     state.characters[characterId] = initCharacter(characterId);
+    var i, fn;
+    for (i = 0; i < deathHook.length; i++) {
+      fn = deathHook[i]
+      if (fn(characterId)) {
+        break;
+      }
+    }
   }
 
   // animate
@@ -459,7 +465,7 @@ var runMove = function (characterId) {
 };
 
 // noop by default
-var deathHook = function () {};
+var deathHook = [];
 
 // Public API
 // ==========
@@ -544,6 +550,15 @@ module.exports = {
     }
   },
   onDie: function (fn) {
-    deathHook = fn;
+    deathHook.push(fn);
+  },
+  removeOnDie: function (fn) {
+    var i;
+    for (i = 0; i < deathHook.length; i++) {
+      if (deathHook[i] === fn) {
+        deathHook.splice(i, 1);
+        return;
+      }
+    }
   }
 };
