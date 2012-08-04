@@ -207,7 +207,7 @@ var neutralAttack = function (character) {
     charAttackOrder.push(i);
   }
   charAttackOrder.sort(randOrd);
-  for (var i = characters.length - 1; i >= 0; i--) {
+  for (var i = characters.length - 1; i >= 0; i--) {  
     if (character !== characters[charAttackOrder[i]]) {
       neutralAttackCollision(character, characters[charAttackOrder[i]]);
     }
@@ -226,6 +226,7 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
+      victim.damage += Math.round(Math.random()*10)
       victim.airJumps = 0;
       dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
@@ -239,7 +240,7 @@ var neutralAttackCollision = function(attacker, victim) {
       victim.state = 'stun';
       victim.onGround = false;
       victim.v_y = -80 * (1+victim.damage/500);
-      victim.damageFrames = 50;
+      victim.damageFrames = 50+victim.damage/20;
       //console.log(victim)
     }
   }
