@@ -199,38 +199,39 @@ var neutralAttack = function (character) {
 
   }
   for (var i = characters.length - 1; i >= 0; i--) {
-        neutralAttackCollision(character, characters[i]);
-      }
+    if (character !== characters[i]) {
+      neutralAttackCollision(character, characters[i]);
+    }
+  }
   character.action = 'attack';
 };
 
-var neutralAttackCollision = function(attacker, victim){
-    if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
-      var dir = 0;
-      if ((attacker.facing === 'left') && (victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
-        dir = -1;
-
-      }
-      if ((attacker.facing === 'right') && (victim.x).isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
-        dir = +1;
-      }
-      if(dir != 0){
-        if(attacker.onGround){
-          victim.v_x += dir * neutralGroundAttackHitSpeed;
-        }
-        else{
-          victim.v_x += dir * neutralAirAttackHitSpeed;
-        }
-        if (dir === 1){
-          victim.state = 'hitRight';
-        }
-        if (dir === -1){
-          victim.state = 'hitLeft';
-        }
+var neutralAttackCollision = function(attacker, victim) {
+  if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
+    var dir = 0;
+    if ((attacker.facing === 'left') && (victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
+      dir = -1;
 
     }
+    if ((attacker.facing === 'right') && (victim.x).isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
+      dir = +1;
     }
-  };
+    if(dir != 0){
+      if(attacker.onGround){
+        victim.v_x += dir * neutralGroundAttackHitSpeed;
+      }
+      else{
+        victim.v_x += dir * neutralAirAttackHitSpeed;
+      }
+      if (dir === 1){
+        victim.state = 'hitRight';
+      }
+      if (dir === -1){
+        victim.state = 'hitLeft';
+      }
+    }
+  }
+};
 
 var leftAttackCollision = function(attacker, victim){
   if (attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height)){
