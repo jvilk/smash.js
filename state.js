@@ -26,6 +26,7 @@ var runMove = function (characterId) {
       character.x += 1;
       break;
   }
+  moveQueue[characterId] = null;
 };
 
 // Public API

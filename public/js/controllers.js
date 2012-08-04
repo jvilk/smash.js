@@ -8,7 +8,7 @@ function AppCtrl($scope, socket) {
   });
 }
 
-function MyCtrl1($scope, socket) {
+function MyCtrl1($scope, socket, keys) {
   socket.on('send:state', function (data) {
     $scope.state = data;
   });
@@ -18,6 +18,8 @@ function MyCtrl1($scope, socket) {
   $scope.right = function () {
     socket.emit('submit:move', 'right');
   };
+
+  keys.enable();
 }
 
 
