@@ -27,7 +27,7 @@ var aerialUpReach = 15;
 var groundDownReach = 8;
 var aerialDownReach = 10;
 
-var stageHeight = 600;
+var stageHeight = 390;
 
 var fps = 5;
 
