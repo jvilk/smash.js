@@ -4,37 +4,22 @@ var state = require('../state.js');
 describe('state', function(){
 
   beforeEach(function () {
-    state.restart(4);
+    state.restart(1);
   });
 
   it('should be initialized with four chars', function(){
-    state.get().characters.length.should.eql(4);
+    state.get().characters.length.should.eql(1);
   });
-  /*
-  describe('#addPlayer', function(){
-    it('should have one more player after adding one', function(){
-      game.addPlayer(new Player());
-      game.numberOfPlayers().should.eql(1);
-    });
+  
+  describe('#runFrame', function(){
+    it('should have working gravity', function(){
+      state.runFrame();
+      var config = state.getConfig();
+      var char1 = state.get().characters[0];
 
-    it('should return true on a successful add', function(){
-      game.addPlayer(new Player()).should.be.true;
-    });
-
-    it('should not allow the same player to be added twice', function(){
-      var player = new Player();
-      game.addPlayer(player);
-      game.addPlayer(player);
-      game.numberOfPlayers().should.eql(1);
-    });
-    
-    it('should bind to a player disconnect', function () {
-      var player = new Player();
-      game.addPlayer(player);
-      player.trigger('disconnect');
-      game.numberOfPlayers().should.eql(0);
+      char1.a_y.should.eql(config.gravity);
     });
   });
-  */
+  
 
 });
