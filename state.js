@@ -2,6 +2,11 @@
 // =======
 var stage = require('./stage.js');
 
+Number.prototype.between = function(first,last){
+    return (first < last ? this >= first && this <= last : this >= last && this <= first);
+}
+
+
 // State Vars
 // ==========
 var state,
@@ -132,8 +137,40 @@ var initCharacter = function (characterId) {
 
 var attack = function (character) {
   character.attackFrames = 20;
+  if character.onGround{
+    if (character.facing === 'right'){
+      character.reach_right = groundNeutralReach;      
+    };
+    if (character.facing === 'left'){
+      character.reach_left = groundNeutralReach;
+    };
+  };
+  else{
+    if (character.facing === 'right'){
+      character.reach_right = aerialNeutralReach;      
+    };
+    if (character.facing === 'left'){
+      character.reach_left = aerialNeutralReach;
+    };
+
+  };
+  for (var i = characters.length - 1; i >= 0; i--) {
+        neutralAttackCollision(character, characters[i]);
+      }
   character.action = 'attack';
 }
+
+var neutralAttackCollision = function(attacker, victim){
+    if attacker.y.isBetween(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).isBetween(victim.y, victim.y+victim.height){
+      if (attacker.facing === 'left' && (victim.x+victim.width).isBetween(attacker.x-attacker.reach_left, attacker.x+attacker.width){
+        victim.v_x -= neutralAttackHitSpeed;
+
+      };
+      if (attacker.facing === 'right' && (victim.x).isBetween(attacker.x, attacker.x+attacker.width+attacker.reach_right){
+        victim.v_x += neutralAttackHitSpeed;
+      };
+    };
+  };
 
 var moveLeft = function (character) {
   if (character.onGround) {
@@ -222,6 +259,7 @@ var runMove = function (characterId) {
       case 'attack':
         attack(character);
         break;
+
       // Basic attacks
       // Special moves
       // No movement
