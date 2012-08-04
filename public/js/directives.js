@@ -177,7 +177,7 @@ myDirectives.directive('smashGame', function (socket, $rootScope) {
 
           // draw it
           ctx.fillText(
-            ch.damage,
+            ch.damage + '%',
             x,
             y - iconHeight/2 + portraitHeight/2
           );

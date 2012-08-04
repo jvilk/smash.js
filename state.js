@@ -154,7 +154,6 @@ var initCharacter = function (characterId) {
     jumps: character.maxAirJumps,
     jumpTimeout: 0
   };
-  console.log(state);
   return _.extend(state, character);
 };
 var leftAttack = function (character){
