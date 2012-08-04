@@ -1,10 +1,14 @@
 // Imports
 // =======
 var stage = require('./stage.js');
+var _ = require('underscore');
 
 Number.prototype.between = function(first,last){
     return (first < last ? this >= first && this <= last : this >= last && this <= first);
 }
+
+function randOrd(){
+return (Math.round(Math.random())-0.5); }
 
 
 // State Vars
@@ -19,19 +23,6 @@ var dt = 1/16;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
-var maxGroundSpeed = 100;
-var maxAirJumps = 1;
-// Attack reaches
-var groundNeutralReach = 10;
-var aerialNeutralReach = 12;
-var groundSideReach = 15;
-var aerialFrontReach = 15;
-var aerialRearReach = 12;
-var groundUpReach = 10;
-var aerialUpReach = 15;
-var groundDownReach = 8;
-var aerialDownReach = 10;
-
 var mapWidth = 1280;
 var mapHeight = 720;
 var deathMargin = 200;
@@ -57,8 +48,48 @@ var neutralAttackFrames = 20;
 var characterArray = {}
 
 var initCharacters = function(){
-  characterArray.link =
-    {
+  return [
+    characterArray.link = {
+      height : 100,
+      width : 30,
+      maxAirJumps : 2,
+      groundNeutralReach : 10,
+      aerialNeutralReach : 12,
+      groundSideReach : 15,
+      aerialFrontReach : 15,
+      aerialRearReach : 12,
+      groundUpReach : 10,
+      aerialUpReach : 15,
+      groundDownReach : 8,
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    },
+    characterArray.kirby = {
+      height : 100,
+      width : 30,
+      maxAirJumps : 10,
+      groundNeutralReach : 10,
+      aerialNeutralReach : 12,
+      groundSideReach : 15,
+      aerialFrontReach : 15,
+      aerialRearReach : 12,
+      groundUpReach : 10,
+      aerialUpReach : 15,
+      groundDownReach : 8,
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    },
+    characterArray.captainfalcon = {
       height : 100,
       width : 30,
       maxAirJumps : 1,
@@ -70,43 +101,24 @@ var initCharacters = function(){
       groundUpReach : 10,
       aerialUpReach : 15,
       groundDownReach : 8,
-      aerialDownReach : 10
-    };
-  characterArray.kirby = {
-    height : 100,
-    width : 30,
-    maxAirJumps : 10,
-    groundNeutralReach : 10,
-    aerialNeutralReach : 12,
-    groundSideReach : 15,
-    aerialFrontReach : 15,
-    aerialRearReach : 12,
-    groundUpReach : 10,
-    aerialUpReach : 15,
-    groundDownReach : 8,
-    aerialDownReach : 10
-  };
-  characterArray.captainfalcon = {
-    height : 100,
-    width : 30,
-    maxAirJumps : 1,
-    groundNeutralReach : 10,
-    aerialNeutralReach : 12,
-    groundSideReach : 15,
-    aerialFrontReach : 15,
-    aerialRearReach : 12,
-    groundUpReach : 10,
-    aerialUpReach : 15,
-    groundDownReach : 8,
-    aerialDownReach : 10
-  };
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    }
+  ];
 }
 
 
 
 
 var initCharacter = function (characterId) {
-  return {
+  var characters = initCharacters();
+  var character = characters[characterId % characters.length];
+  var state = {
     // Position
     x: characterId * spawnSpacing + 500,
     y: spawnHeight,
@@ -137,9 +149,11 @@ var initCharacter = function (characterId) {
     attackFrames: 0,
     damageFrames: 0,
     invulFrames: 0,
-    jumps: 2,
+    jumps: character.maxAirJumps,
     jumpTimeout: 0
   };
+  console.log(state);
+  return _.extend(state, character);
 };
 var leftAttack = function (character){
   character.attackFrames = 20;
@@ -185,23 +199,28 @@ var neutralAttack = function (character) {
   character.attackFrames = neutralAttackFrames;
   if (character.onGround){
     if (character.facing === 'right'){
-      character.reach_right = groundNeutralReach;      
+      character.reach_right = character.groundNeutralReach;
     }
     if (character.facing === 'left'){
-      character.reach_left = groundNeutralReach;
+      character.reach_left = character.groundNeutralReach;
     }
   } else {
     if (character.facing === 'right'){
-      character.reach_right = aerialNeutralReach;      
+      character.reach_right = character.aerialNeutralReach;
     }
     if (character.facing === 'left'){
-      character.reach_left = aerialNeutralReach;
+      character.reach_left = character.aerialNeutralReach;
     }
 
   }
+  var charAttackOrder = []
   for (var i = characters.length - 1; i >= 0; i--) {
-    if (character !== characters[i]) {
-      neutralAttackCollision(character, characters[i]);
+    charAttackOrder.push(i);
+  }
+  charAttackOrder.sort(randOrd);
+  for (var i = characters.length - 1; i >= 0; i--) {  
+    if (character !== characters[charAttackOrder[i]]) {
+      neutralAttackCollision(character, characters[charAttackOrder[i]]);
     }
   }
   character.action = 'attack';
@@ -218,18 +237,20 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
+      victim.damage += Math.round(Math.random()*10)
+      victim.airJumps = 0;
       victim.damage += 100;
       dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
         victim.damage += 10;
-        victim.v_x += dir * neutralGroundAttackHitSpeed;
+        victim.v_x += dir * attacker.neutralGroundAttackHitSpeed;
       } else{
-        victim.v_x += dir * neutralAirAttackHitSpeed;
+        victim.v_x += dir * attacker.neutralAirAttackHitSpeed;
       }
       victim.state = 'stun';
       victim.onGround = false;
       victim.v_y = -80 * (1+victim.damage/500);
-      victim.damageFrames = 50;
+      victim.damageFrames = 50+victim.damage/20;
       //console.log(victim)
     }
   }
@@ -241,13 +262,13 @@ var leftAttackCollision = function(attacker, victim){
     if ((victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       var dir = -1;
       if(attacker.onGround){
-        victim.v_x+= dir * leftGroundAttackHitSpeed;
+        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
       } else {
         if (attacker.facing === 'left'){
-          victim.v_x += dir * airFrontAttackHitSpeed;
+          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
         }
         if (attacker.facing === 'right'){
-          victim.v_x += dir * airRearAttackHitSpeed;
+          victim.v_x += dir * attacker.airRearAttackHitSpeed;
         }
       }
     }
@@ -260,15 +281,15 @@ var rightAttackCollision = function(attacker, victim){
     if (victim.x.between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
       dir = 1;
       if(attacker.onGround){
-        victim.v_x+= dir * leftGroundAttackHitSpeed;
+        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
       }
     
       else{
         if (attacker.facing === 'left'){
-          victim.v_x += dir * airFrontAttackHitSpeed;
+          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
         }
         if (attacker.facing === 'right'){
-          victim.v_x += dir * airRearAttackHitSpeed;
+          victim.v_x += dir * attacker.airRearAttackHitSpeed;
         }
       }
     }
@@ -312,7 +333,7 @@ var moveUp = function (character) {
     if (character.onGround) {
       character.v_y = -120;
     } else {
-      character.v_y -= 80;
+      character.v_y = -80;
     }
   }
 };
@@ -403,10 +424,10 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight && (character.y - character.v_y*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
+  if (character.y > stageHeight && (character.y - character.v_y*6*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
-    character.jumps = 2;
+    character.jumps = character.maxAirJumps;
     character.jumpTimeout = 0;
     character.v_y = 0;
   }
@@ -445,8 +466,14 @@ var runMove = function (characterId) {
   character.y += character.v_y * dt;
 
   if (isDead(character)) {
-    deathHook(characterId);
     state.characters[characterId] = initCharacter(characterId);
+    var i, fn;
+    for (i = 0; i < deathHook.length; i++) {
+      fn = deathHook[i]
+      if (fn(characterId)) {
+        break;
+      }
+    }
   }
 
   // animate
@@ -459,7 +486,7 @@ var runMove = function (characterId) {
 };
 
 // noop by default
-var deathHook = function () {};
+var deathHook = [];
 
 // Public API
 // ==========
@@ -544,6 +571,15 @@ module.exports = {
     }
   },
   onDie: function (fn) {
-    deathHook = fn;
+    deathHook.push(fn);
+  },
+  removeOnDie: function (fn) {
+    var i;
+    for (i = 0; i < deathHook.length; i++) {
+      if (deathHook[i] === fn) {
+        deathHook.splice(i, 1);
+        return;
+      }
+    }
   }
 };
