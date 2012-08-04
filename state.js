@@ -7,6 +7,9 @@ Number.prototype.between = function(first,last){
     return (first < last ? this >= first && this <= last : this >= last && this <= first);
 }
 
+function randOrd(){
+return (Math.round(Math.random())-0.5); }
+
 
 // State Vars
 // ==========
@@ -210,9 +213,14 @@ var neutralAttack = function (character) {
     }
 
   }
+  var charAttackOrder = []
   for (var i = characters.length - 1; i >= 0; i--) {
-    if (character !== characters[i]) {
-      neutralAttackCollision(character, characters[i]);
+    charAttackOrder.push(i);
+  }
+  charAttackOrder.sort(randOrd);
+  for (var i = characters.length - 1; i >= 0; i--) {
+    if (character !== characters[charAttackOrder[i]]) {
+      neutralAttackCollision(character, characters[charAttackOrder[i]]);
     }
   }
   character.action = 'attack';
@@ -323,7 +331,7 @@ var moveUp = function (character) {
     if (character.onGround) {
       character.v_y = -120;
     } else {
-      character.v_y -= 80;
+      character.v_y = -80;
     }
   }
 };
@@ -414,7 +422,7 @@ var runMove = function (characterId) {
   }
 
   // check for collision w\ stage
-  if (character.y > stageHeight && (character.y - character.v_y*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
+  if (character.y > stageHeight && (character.y - character.v_y*6*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
     character.jumps = character.maxAirJumps;
@@ -456,8 +464,14 @@ var runMove = function (characterId) {
   character.y += character.v_y * dt;
 
   if (isDead(character)) {
-    deathHook(characterId);
     state.characters[characterId] = initCharacter(characterId);
+    var i, fn;
+    for (i = 0; i < deathHook.length; i++) {
+      fn = deathHook[i]
+      if (fn(characterId)) {
+        break;
+      }
+    }
   }
 
   // animate
@@ -470,7 +484,7 @@ var runMove = function (characterId) {
 };
 
 // noop by default
-var deathHook = function () {};
+var deathHook = [];
 
 // Public API
 // ==========
@@ -555,6 +569,15 @@ module.exports = {
     }
   },
   onDie: function (fn) {
-    deathHook = fn;
+    deathHook.push(fn);
+  },
+  removeOnDie: function (fn) {
+    var i;
+    for (i = 0; i < deathHook.length; i++) {
+      if (deathHook[i] === fn) {
+        deathHook.splice(i, 1);
+        return;
+      }
+    }
   }
 };
