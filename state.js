@@ -38,6 +38,55 @@ var fps = 5;
 // Private Helpers
 // ===============
 
+var characterArray = {}
+
+var initCharacters = function(){
+  characterArray.link =
+    {
+      height : 100,
+      width : 30,
+      maxAirJumps : 1,
+      groundNeutralReach : 10,
+      aerialNeutralReach : 12,
+      groundSideReach : 15,
+      aerialFrontReach : 15,
+      aerialRearReach : 12,
+      groundUpReach : 10,
+      aerialUpReach : 15,
+      groundDownReach : 8,
+      aerialDownReach : 10
+    };
+  characterArray.kirby = {
+    height : 100,
+    width : 30,
+    maxAirJumps : 10,
+    groundNeutralReach : 10,
+    aerialNeutralReach : 12,
+    groundSideReach : 15,
+    aerialFrontReach : 15,
+    aerialRearReach : 12,
+    groundUpReach : 10,
+    aerialUpReach : 15,
+    groundDownReach : 8,
+    aerialDownReach : 10
+  };
+  characterArray.captainfalcon = {
+    height : 100,
+    width : 30,
+    maxAirJumps : 1,
+    groundNeutralReach : 10,
+    aerialNeutralReach : 12,
+    groundSideReach : 15,
+    aerialFrontReach : 15,
+    aerialRearReach : 12,
+    groundUpReach : 10,
+    aerialUpReach : 15,
+    groundDownReach : 8,
+    aerialDownReach : 10
+  };
+}
+
+
 
 
 var initCharacter = function (characterId) {
