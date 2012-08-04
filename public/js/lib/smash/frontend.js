@@ -1,4 +1,4 @@
-$(document).ready(main);
+//$(document).ready(main);
 
 function main() {
   var characters = [
@@ -46,8 +46,8 @@ function main() {
   refresh(characters);
 }
 
-function refresh(characters) {
-  var canvas = $("#game").clearCanvas();
+function refresh(elt, characters) {
+  var canvas = $(elt).clearCanvas();
 
   // draw background
   //canvas.drawImage({

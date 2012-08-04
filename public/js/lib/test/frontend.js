@@ -1,7 +1,7 @@
-$(document).ready(main);
+//$(document).ready(main);
 
-function main() {
-  var canvas = $("#game").clearCanvas();
+function main(elt, data) {
+  var canvas = $(elt).clearCanvas();
 
   // draw background
   //canvas.drawImage({
@@ -117,5 +117,5 @@ function main() {
       height: character.height,
       fillStyle: "#00F"
     });
-  })
+  });
 }
