@@ -36,7 +36,7 @@ var fps = 5;
 var initCharacter = function (characterId) {
   return {
     // Position
-    x: characterId * spawnSpacing,
+    x: characterId * spawnSpacing + 500,
     y: spawnHeight,
     // Direction facing
     facing: 'left',
