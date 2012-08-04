@@ -25,6 +25,8 @@ var spawnHeight = 10;
 var mapWidth = 1280;
 var mapHeight = 720;
 var deathMargin = 200;
+var xoffset = 30;
+var yoffset = 20;
 
 var stageHeight = 378;
 
@@ -50,9 +52,9 @@ var characterArray = {}
 var initCharacters = function(){
   return [
     characterArray.link = {
-      height : 92,
-      width : 72,
-      maxAirJumps : 2,
+      height : 40,
+      width : 30,
+      maxAirJumps : 1,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
       groundSideReach : 15,
@@ -70,9 +72,9 @@ var initCharacters = function(){
       neutralAttackFrames: 20,
     },
     characterArray.kirby = {
-      height : 94,
-      width : 72,
-      maxAirJumps : 10,
+      height : 40,
+      width : 30,
+      maxAirJumps : 1,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
       groundSideReach : 15,
@@ -90,8 +92,8 @@ var initCharacters = function(){
       neutralAttackFrames: 20,
     },
     characterArray.captainfalcon = {
-      height : 94,
-      width : 72,
+      height : 40,
+      width : 30,
       maxAirJumps : 1,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
@@ -129,8 +131,8 @@ var initCharacter = function (characterId) {
     v_x: 0,
     v_y: 0,
     // Character area (hit box)
-    height: 100,
-    width: 30,
+    height: 40,
+    width: 40,
     // TODO Character state
     // state: 'stun',
     onGround: false,
@@ -230,7 +232,7 @@ var neutralAttack = function (character) {
 
 var neutralAttackCollision = function(attacker, victim) {
   //console.log(attacker, victim);
-  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height/2).between(victim.y, victim.y + victim.height))) {
+  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height))) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
