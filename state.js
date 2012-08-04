@@ -8,6 +8,7 @@ var max_ground_x = 50;
 var max_ground_y = 50;
 var gravity = -5;
 var max_air_jumps = 1;
+var dt = 1/24;
 
 // Private Helpers
 // ===============
@@ -79,7 +80,6 @@ var runMove = function (characterId) {
 
 var updateCharacterMotion = function (characterId) {
   var character = state.characters[characterId];
-  var dt = 1/24;
   // Velocity calculation
   //Characters have a max ground velocity, no max air velocity
   if (character.onGround) {
@@ -124,10 +124,15 @@ module.exports = {
     // Detect ground for each char
   },
   setMove: function (player, move) {
-    console.log(move);
     moveQueue[player] = move;
   },
   get: function () {
     return state;
+  },
+  getConfig: function () {
+    return {
+      gravity: gravity,
+      dt: dt
+    }
   }
 };
