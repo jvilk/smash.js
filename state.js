@@ -1,6 +1,7 @@
 // Imports
 // =======
 var stage = require('./stage.js');
+var _ = require('underscore');
 
 Number.prototype.between = function(first,last){
     return (first < last ? this >= first && this <= last : this >= last && this <= first);
@@ -8,7 +9,6 @@ Number.prototype.between = function(first,last){
 
 function randOrd(){
 return (Math.round(Math.random())-0.5); }
-
 
 // State Vars
 // ==========
@@ -18,28 +18,15 @@ var state,
 var numCharacters = 1;
 // World state
 var gravity = 3;
-var dt = 1/16;
+var dt = 1/6;
 var spawnSpacing = 50;
 var spawnHeight = 10;
 // Game option
-var maxGroundSpeed = 100;
-var maxAirJumps = 1;
-// Attack reaches
-var groundNeutralReach = 10;
-var aerialNeutralReach = 12;
-var groundSideReach = 15;
-var aerialFrontReach = 15;
-var aerialRearReach = 12;
-var groundUpReach = 10;
-var aerialUpReach = 15;
-var groundDownReach = 8;
-var aerialDownReach = 10;
-
 var mapWidth = 1280;
 var mapHeight = 720;
 var deathMargin = 200;
 
-var stageHeight = 390;
+var stageHeight = 378;
 
 //these numbers are random guesses and subject to change
 var stageLeft = 1010;
@@ -53,6 +40,7 @@ var sideGroundAttackHitSpeed = 17;
 var airRearAttackHitSpeed = 25;
 var airFrontAttackHitSpeed = 18;
 
+var lastHit;
 var neutralAttackFrames = 20;
 // Private Helpers
 // ===============
@@ -60,10 +48,50 @@ var neutralAttackFrames = 20;
 var characterArray = {}
 
 var initCharacters = function(){
-  characterArray.link =
-    {
-      height : 100,
-      width : 30,
+  return [
+    characterArray.link = {
+      height : 92,
+      width : 72,
+      maxAirJumps : 2,
+      groundNeutralReach : 10,
+      aerialNeutralReach : 12,
+      groundSideReach : 15,
+      aerialFrontReach : 15,
+      aerialRearReach : 12,
+      groundUpReach : 10,
+      aerialUpReach : 15,
+      groundDownReach : 8,
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    },
+    characterArray.kirby = {
+      height : 94,
+      width : 72,
+      maxAirJumps : 10,
+      groundNeutralReach : 10,
+      aerialNeutralReach : 12,
+      groundSideReach : 15,
+      aerialFrontReach : 15,
+      aerialRearReach : 12,
+      groundUpReach : 10,
+      aerialUpReach : 15,
+      groundDownReach : 8,
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    },
+    characterArray.captainfalcon = {
+      height : 94,
+      width : 72,
       maxAirJumps : 1,
       groundNeutralReach : 10,
       aerialNeutralReach : 12,
@@ -73,43 +101,24 @@ var initCharacters = function(){
       groundUpReach : 10,
       aerialUpReach : 15,
       groundDownReach : 8,
-      aerialDownReach : 10
-    };
-  characterArray.kirby = {
-    height : 100,
-    width : 30,
-    maxAirJumps : 10,
-    groundNeutralReach : 10,
-    aerialNeutralReach : 12,
-    groundSideReach : 15,
-    aerialFrontReach : 15,
-    aerialRearReach : 12,
-    groundUpReach : 10,
-    aerialUpReach : 15,
-    groundDownReach : 8,
-    aerialDownReach : 10
-  };
-  characterArray.captainfalcon = {
-    height : 100,
-    width : 30,
-    maxAirJumps : 1,
-    groundNeutralReach : 10,
-    aerialNeutralReach : 12,
-    groundSideReach : 15,
-    aerialFrontReach : 15,
-    aerialRearReach : 12,
-    groundUpReach : 10,
-    aerialUpReach : 15,
-    groundDownReach : 8,
-    aerialDownReach : 10
-  };
+      aerialDownReach : 10,
+      neutralGroundAttackHitSpeed: 10,
+      neutralAirAttackHitSpeed: 19,
+      sideGroundAttackHitSpeed: 17,
+      airRearAttackHitSpeed: 25,
+      airFrontAttackHitSpeed: 18,
+      neutralAttackFrames: 20,
+    }
+  ];
 }
 
 
 
 
 var initCharacter = function (characterId) {
-  return {
+  var characters = initCharacters();
+  var character = characters[characterId % characters.length];
+  var state = {
     // Position
     x: characterId * spawnSpacing + 500,
     y: spawnHeight,
@@ -136,13 +145,17 @@ var initCharacter = function (characterId) {
     frame: 0,
     action: 'stand',
 
+
     // state variables
     attackFrames: 0,
     damageFrames: 0,
-    invulFrames: 0,
-    jumps: 2,
+    invulnFrames: 0,
+    lastHit : -1,
+    jumps: character.maxAirJumps,
     jumpTimeout: 0
   };
+  console.log(state);
+  return _.extend(state, character);
 };
 var leftAttack = function (character){
   character.attackFrames = 20;
@@ -188,17 +201,17 @@ var neutralAttack = function (character) {
   character.attackFrames = neutralAttackFrames;
   if (character.onGround){
     if (character.facing === 'right'){
-      character.reach_right = groundNeutralReach;      
+      character.reach_right = character.groundNeutralReach;
     }
     if (character.facing === 'left'){
-      character.reach_left = groundNeutralReach;
+      character.reach_left = character.groundNeutralReach;
     }
   } else {
     if (character.facing === 'right'){
-      character.reach_right = aerialNeutralReach;      
+      character.reach_right = character.aerialNeutralReach;
     }
     if (character.facing === 'left'){
-      character.reach_left = aerialNeutralReach;
+      character.reach_left = character.aerialNeutralReach;
     }
 
   }
@@ -207,7 +220,7 @@ var neutralAttack = function (character) {
     charAttackOrder.push(i);
   }
   charAttackOrder.sort(randOrd);
-  for (var i = characters.length - 1; i >= 0; i--) {
+  for (var i = characters.length - 1; i >= 0; i--) {  
     if (character !== characters[charAttackOrder[i]]) {
       neutralAttackCollision(character, characters[charAttackOrder[i]]);
     }
@@ -217,7 +230,7 @@ var neutralAttack = function (character) {
 
 var neutralAttackCollision = function(attacker, victim) {
   //console.log(attacker, victim);
-  if (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height)) {
+  if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height))) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       dir = -1;
@@ -226,20 +239,24 @@ var neutralAttackCollision = function(attacker, victim) {
       dir = 1;
     }
     if (dir !== 0) {
+      victim.lastHit = attacker.characterId;
+      victim.damage += Math.round(Math.random()*10)
       victim.airJumps = 0;
+      victim.damage += 40;
       dir = dir * (1 + victim.damage/100);
       if (attacker.onGround) {
-        victim.damage += 50;
-        victim.v_x += dir * neutralGroundAttackHitSpeed;
+        victim.damage += 15;
+        victim.v_x += dir * attacker.neutralGroundAttackHitSpeed;
       } else{
-        victim.damage += 100;
+        victim.damage += 25;
 
-        victim.v_x += dir * neutralAirAttackHitSpeed;
+        victim.v_x += dir * attacker.neutralAirAttackHitSpeed;
       }
       victim.state = 'stun';
       victim.onGround = false;
       victim.v_y = -80 * (1+victim.damage/500);
-      victim.damageFrames = 50;
+      victim.damageFrames = 50+victim.damage/20;
+      victim.invulnFrames = 15;
       //console.log(victim)
     }
   }
@@ -251,13 +268,13 @@ var leftAttackCollision = function(attacker, victim){
     if ((victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
       var dir = -1;
       if(attacker.onGround){
-        victim.v_x+= dir * leftGroundAttackHitSpeed;
+        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
       } else {
         if (attacker.facing === 'left'){
-          victim.v_x += dir * airFrontAttackHitSpeed;
+          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
         }
         if (attacker.facing === 'right'){
-          victim.v_x += dir * airRearAttackHitSpeed;
+          victim.v_x += dir * attacker.airRearAttackHitSpeed;
         }
       }
     }
@@ -270,15 +287,15 @@ var rightAttackCollision = function(attacker, victim){
     if (victim.x.between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
       dir = 1;
       if(attacker.onGround){
-        victim.v_x+= dir * leftGroundAttackHitSpeed;
+        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
       }
     
       else{
         if (attacker.facing === 'left'){
-          victim.v_x += dir * airFrontAttackHitSpeed;
+          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
         }
         if (attacker.facing === 'right'){
-          victim.v_x += dir * airRearAttackHitSpeed;
+          victim.v_x += dir * attacker.airRearAttackHitSpeed;
         }
       }
     }
@@ -416,7 +433,7 @@ var runMove = function (characterId) {
   if (character.y > stageHeight && (character.y - character.v_y*6*dt) < stageHeight && character.x > stageRight && character.x < stageLeft) {
     character.y = stageHeight;
     character.onGround = true;
-    character.jumps = 2;
+    character.jumps = character.maxAirJumps;
     character.jumpTimeout = 0;
     character.v_y = 0;
   }
@@ -435,6 +452,13 @@ var runMove = function (characterId) {
 
   if (character.attackFrames > 0) {
     character.attackFrames -= 1;
+    var characters = state.characters;
+    for (var i = characters.length - 1; i >= 0; i--) {  
+      if (character !== characters[i]) {
+        neutralAttackCollision(character, characters[i]);
+      }
+    }
+
     if (character.attackFrames === 0) {
       character.reach_left = 0;
       character.reach_right = 0;
@@ -445,9 +469,13 @@ var runMove = function (characterId) {
 
   if (character.damageFrames > 0) {
     character.damageFrames -= 1;
-    if (character.damageFrames === 0) {
+    if (character.damageFrames <= 2) {
       character.action = 'stand'
     }
+  }
+
+  if (character.invulnFrames > 0){
+    character.invulnFrames -= 1;
   }
 
   // Position calculation
@@ -495,8 +523,14 @@ module.exports = {
   // Update frame using latest actions
   runFrame: function () {
     // Process moves
+    var priorityQueue = []
+    for (var i = 0; i < numCharacters; i++){
+      priorityQueue[i] = i;
+    }
+
+    priorityQueue.sort(randOrd)
     for (var i = 0; i < numCharacters; i++) {
-      runMove(i);
+      runMove(priorityQueue[i]);
     }
     // Process hits
     for (var i = 0; i < numCharacters; i++) {
@@ -525,6 +559,7 @@ module.exports = {
 
   setMove: function (player, move) {
     moveQueue[player] = move;
+
   },
 
   get: function () {

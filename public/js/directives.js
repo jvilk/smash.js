@@ -15,9 +15,9 @@ myDirectives.directive('appVersion', function(version) {
 myDirectives.directive('smashGame', function (socket, $rootScope) {
 
   var characterNames = [
-    'Link',
-    'Link',
-    'Link',
+    'Link4',
+    'Link2',
+    'Link3',
     'Link'
   ];
 
