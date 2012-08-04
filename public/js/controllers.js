@@ -9,13 +9,17 @@ function AppCtrl($scope, socket) {
 }
 
 function MyCtrl1($scope, socket) {
-  socket.on('send:time', function (data) {
-    $scope.time = data.time;
+  socket.on('send:state', function (data) {
+    $scope.state = data;
   });
+  $scope.left = function () {
+    socket.emit('submit:move', 'left');
+  };
+  $scope.right = function () {
+    socket.emit('submit:move', 'right');
+  };
 }
-MyCtrl1.$inject = ['$scope', 'socket'];
 
 
 function MyCtrl2() {
 }
-MyCtrl2.$inject = [];
