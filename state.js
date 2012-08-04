@@ -54,7 +54,9 @@ var initCharacter = function (characterId) {
     reach_left: 0,
     reach_right: 0,
     reach_bottom: 0,
-    reach_top: 0
+    reach_top: 0,
+    frame: 0,
+    action: 'stand'
   };
 };
 
@@ -156,6 +158,10 @@ var runMove = function (characterId) {
     default:
       character.a_x = 0;
       character.a_y = gravity;
+      character.frame += 1;
+      if (character.frame >= 4) {
+        character.frame = 0;
+      }
       break;
   }
 
@@ -242,8 +248,12 @@ module.exports = {
         return {
           x: ch.x,
           y: ch.y,
+          
           height: ch.height,
-          width: ch.width
+          width: ch.width,
+
+          frame: ch.frame,
+          action: ch.action
         };
       })
     };

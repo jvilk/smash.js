@@ -28,11 +28,29 @@ myDirectives.directive('smashGame', function (socket) {
   };
 
   var charResources = characterNames.map(function (res) {
-    return {
-      portrait: makeImg(res.toLowerCase() + '/sprite.gif'),
-      sprite: makeImg(res.toLowerCase() + '/character.gif'),
+    var lowRes = res.toLowerCase();
+
+    var ret = {
+      portrait: makeImg(lowRes + '/portrait.gif'),
       name: res
     };
+
+    [{
+      name:'stand',
+      frames: 4
+    }].forEach(function (item) {
+      ret[item.name] = [];
+      var i, num;
+      for (i = 1; i <= item.frames; i++) {
+        num = i;
+        if (num < 10) {
+          num = '0' + num;
+        }
+        ret[item.name].push(makeImg(lowRes + '/' + item.name + '/' + num + '.png'))
+      }
+    })
+
+    return ret;
   });
 
   var mapImg = makeImg('final-destination.png');
@@ -70,11 +88,9 @@ myDirectives.directive('smashGame', function (socket) {
         characters.forEach(function (ch, i) {
           var charResource = charResources[i];
           ctx.drawImage(
-            charResource.sprite,
+            charResource[ch.action][ch.frame],
             ch.x,
-            ch.y,
-            ch.width,
-            ch.height
+            ch.y
           );
         });
 
