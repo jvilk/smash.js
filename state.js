@@ -157,7 +157,6 @@ var initCharacter = function (characterId) {
     jumps: character.maxAirJumps,
     jumpTimeout: 0
   };
-  console.log(state);
   return _.extend(state, character);
 };
 var leftAttack = function (character){
@@ -490,7 +489,7 @@ var runMove = function (characterId) {
     var i, fn;
     for (i = 0; i < deathHook.length; i++) {
       fn = deathHook[i]
-      if (fn(characterId)) {
+      if (fn(characterId, character.lastHit)) {
         break;
       }
     }

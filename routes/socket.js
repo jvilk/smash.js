@@ -139,7 +139,8 @@ module.exports = {
     var me = {
       id: getSpot(),
       data: {
-        name: userNames.getGuestName()
+        name: userNames.getGuestName(),
+        kills: 0
       }
     };
 
@@ -203,15 +204,17 @@ module.exports = {
       userNames.free(me.data.name);
     });
 
-    function deathListener (playerId) {
+    function deathListener (playerId, killerId) {
       var next;
       if (playerId === me.id) {
+        if (killerId !== -1 && characterToPlayer[killerId]) {
+          characterToPlayer[killerId].kills += 1;
+        }
         if (playQueue.length > 0) {
           giveSomeoneMySpot(me);
           playQueue.push(me);
-        } else {
-          freeSpot(me.id);
         }
+        sendPlayers();
         return true;
       } else {
         return false;
