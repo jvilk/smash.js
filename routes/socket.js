@@ -43,7 +43,7 @@ module.exports = {
     state.restart(numPlayers);
     setInterval(function () {
       state.runFrame();
-      sockets.emit('send:state', state.get());
+      sockets.emit('send:state', state.getSerialized());
     }, 30);
   },
   connect: function (socket) {
