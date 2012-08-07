@@ -9,6 +9,29 @@
  * with 'player', which is one of the players)
  */
 
+/**
+ * IDEAS
+ * * Have a 'attack' object that encapsulates the attack's range.
+ *  - Will need to not copy these objects if I do this.
+ * * Have a 'selectmove' function that takes in a playerstate
+ *   and spits out the correct move object.
+ * * Perhaps this should just use the stage to determine the
+ *   correct location of the character, and leave attacking
+ *   stuff to the state.
+ * * Put move functions here that update the playerstate.
+ * * Put attack functions here?
+ * * Perhaps 'reach' should be expressed as a bounding box.
+ * * Perhaps each character should be a separate module
+ *   with a very specific and small interface.
+ *   -> e.g. move(direction)
+             getAttack(playerState, direction)
+ * * Perhaps only playerstate will know the state of the world.
+ *   Then, we call a function from here to try to change it to
+ *   something, and it ends up checking the world and such.
+ * * I like the idea of passing small state objects around
+     static functions to mutate them.
+ */
+
 // Imports
 var _ = require('underscore');
 

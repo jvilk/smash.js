@@ -72,7 +72,6 @@ var neutralAttack = function (player) {
 };
 
 var neutralAttackCollision = function(attacker, victim) {
-  //console.log(attacker, victim);
   if (victim.invulnFrames === 0 && (attacker.y.between(victim.y, victim.y + victim.height) || (attacker.y + attacker.height).between(victim.y, victim.y + victim.height))) {
     var dir = 0;
     if ((attacker.facing === 'left') && (victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
@@ -100,7 +99,6 @@ var neutralAttackCollision = function(attacker, victim) {
       victim.v_y = -80 * (1+victim.damage/500);
       victim.damageFrames = 50+victim.damage/20;
       victim.invulnFrames = 15;
-      //console.log(victim)
     }
   }
 };
@@ -237,7 +235,7 @@ var runMove = function (playerId) {
   player.y += player.v_y * dt;
 
   if (isDead(player)) {
-    players[playerId] = playerstate.getPlayerState(playerId, player.playerId, spawnSpacing, spawnHeight);
+    players[playerId] = playerstate.getPlayerState(playerId, player.playerId, player.playerId * spawnSpacing + 500, spawnHeight);
     var i, fn;
     for (i = 0; i < deathHook.length; i++) {
       fn = deathHook[i];
@@ -268,7 +266,7 @@ module.exports = {
     players = [];
     var i;
     for (i = 0; i < numPlayers; i++) {
-      players[i] = playerstate.getPlayerState(i, 0, spawnSpacing, spawnHeight);
+      players[i] = playerstate.getPlayerState(i, 0, i * spawnSpacing + 500, spawnHeight);
     }
     moveQueue = [];
   },

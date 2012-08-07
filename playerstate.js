@@ -16,30 +16,28 @@ var characters = require('./characters.js');
  * The good news is that that only happens when either the stage
  * is initially created or when players die. So, unless players
  * are dying every few milliseconds, we're good. :)
- *
- * TODO: Make this a better constructor. :)
  */
-var createState = function(thePlayerId, characterId, spawnSpacing, spawnHeight) {
+var createState = function(thePlayerId, characterId, start_x, start_y) {
   var character = characters.getCharacter(characterId);
 
   var defaultState = {
     playerId: thePlayerId,
     // Position
-    x: thePlayerId * spawnSpacing + 500,
-    y: spawnHeight,
+    // should really get from state directly...
+    x: start_x,
+    y: start_y,
+
     // Direction facing
     facing: 'left',
     // Velocity
     v_x: 0,
     v_y: 0,
-    // Character area (hit box)
-    height: 40,
-    width: 40,
     // TODO Character state
     // state: 'stun',
     onGround: false,
     airJumps: 0,
     damage: 0,
+    
     // Vars for attacks
     reach_left: 0,
     reach_right: 0,
@@ -65,10 +63,11 @@ var createState = function(thePlayerId, characterId, spawnSpacing, spawnHeight) 
   // here. Refactor.
   var playerState = _.extend(defaultState, character);
 
+  // TODO: These should be in 'character'.
   playerState.moveLeft = function() {
     if (this.onGround) {
       this.v_x = -75;
-    } 
+    }
     else {
       this.v_x = -50;
     }
