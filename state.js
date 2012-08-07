@@ -272,6 +272,103 @@ module.exports = {
   },
   // Update frame using latest actions
   runFrame: function () {
+    // JVILK'S ENVISIONED REVISION
+    // 0. Client only knows about 'entities'. 'entities' are
+    //    defined by their type and image. The client only needs
+    //    to stupidly paint the entities at the right location
+    //    and at the right depth (z), and it needs to know which are
+    //    players so it can determine name and damage info.
+    //    Animations...?
+
+    // 1: Randomize player update order.
+    //
+    // FOR EACH PLAYER:
+    // 2: Pass the player's character the playerstate,
+    //    the stage, and the move that is being done.
+    //    (left, leftattack, right, rightattack, etc)
+    //    (or direction, isAttacking combo)
+    // MOVE PHASE:
+    // 3. Determine the player's new velocity with this
+    //    information, and set them in the object.
+    // 3: Determine the player's new x and y coordinates
+    //    with this information. DO NOT UPDATE THE PLAYERSTATE.
+    // 4: Pass the player state and the new x and y coordinates
+    //    to the stage.
+    // 5: The stage will determine:
+    //    * 'Safe' x and y coordinates according to terrain concerns.
+    //    * If the player has collided with a stage object, it will
+    //      update the player's damage, velocity, state, and other
+    //      variables accordingly.
+    //    * Potentially also the ability to update the velocity according
+    //      to the angle of the platform, friction, and other info.
+    //    It will mutate the playerinfo accordingly, and return to
+    //    the character function.
+    // 6: Next, if the player is attacking and eligible to attack,
+    //    the player's action (left/right/up/down attack) will
+    //    select the appropriate 'attack' object.
+    //    'eligible' means not stunned, etc.
+    //    'attack' objects either:
+    //     * Create a bounding box relative to the character that causes
+    //       others a certain amount of damage and lasts a specific amount
+    //       of turns unless preempted. Only one of these can occur at
+    //       a time. They can be preempted by various things, too.
+    //       (player gets hit somehow, player uses some command that
+    //       aborts it...).
+    //       Note that you can allow the current attack to influence
+    //       the logic above that determines the player's new velocity
+    //       for movements (e.g. b+up in Melee with Link influences
+    //       left+right mobility and cannot be escaped w/ a jump).
+    //       Also, note that the entity may also need a reference back
+    //       to the player.
+    //
+    //     * Creates a nonplayer entity that has its own velocity and game logic.
+    //       We can have as many of these as we want, although they may
+    //       record data in the playerState regarding when it was last
+    //       used. They are updated in a similar fashion as players,
+    //       except they do not have any movement -- they are
+    //       just influenced by the environment.
+    //
+    //    Both types of attacks are registered with the global
+    //    state as nonplayer entities with bounding boxes. The only
+    //    difference between them is that playerState is aware of
+    //    the non-projectile attack.
+    //
+    // ENDFOR
+    //
+    // 7: Randomize all nonplayer entities (including those created
+    //    this turn). MAKE A COPY OF THIS STRUCT -- nonplayer entities
+    //    can be created as a result of processing these entities.
+    //
+    // Now we're at collision detection. :)
+    //
+    // FOR EACH NONPLAYER ENTITY:
+    // 8: Run a 'move' (have it update its x and y position according
+    //    to its velocity, and check if it hits something on the stage).
+    //    You can imagine it mutating, e.g. a missile hitting a wall could
+    //    turn into an explosion nonplayer entity that hurts nearby
+    //    players.
+    //    This returns to runFrame.
+    // 9: Determine if it collides with any other entity, player or
+    //    non-player. If it does, run its collision function with
+    //    the target.
+    //    Note that this (collision detection) could be optimized
+    //    if it proves slow.
+    //    See some of the posts on my friend's blog...
+    //    http://ductomaniac.wordpress.com/
+    //
+    //    You can imagine these having fun special cases, e.g.
+    //    Link's Sword with Link's Sword results in the attacks
+    //    canceling out.
+    //    You can also imagine having a 'priority' attribute that
+    //    determines which wins out. Or having things mutate
+    //    (sword + missile = kaboom).
+    //
+    // Other notes:
+    // * We should have a concept of 'weight' and 'force'.
+    // * Things should exert directed force on other things.
+    // * Damage decreases weight, as in Smash.
+    
+
     // Process moves
     var priorityQueue = [];
     var i;
