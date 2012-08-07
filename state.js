@@ -15,8 +15,7 @@ function randOrd(){
 
 // State Vars
 // ==========
-var state,
-  moveQueue;
+var state, moveQueue;
 // Num players
 var numPlayers = 1;
 // World state
@@ -28,8 +27,6 @@ var spawnHeight = 10;
 var mapWidth = 1280;
 var mapHeight = 720;
 var deathMargin = 200;
-var xoffset = 30;
-var yoffset = 20;
 
 var stageHeight = 378;
 
@@ -39,61 +36,12 @@ var stageRight = 260;
 
 var fps = 3;
 
-var neutralGroundAttackHitSpeed = 10;
-var neutralAirAttackHitSpeed = 19;
-var sideGroundAttackHitSpeed = 17;
-var airRearAttackHitSpeed = 25;
-var airFrontAttackHitSpeed = 18;
-
-var lastHit;
-var neutralAttackFrames = 20;
-
 var players = [];
 
 // Private Helpers
 // ===============
-
-
-var leftAttack = function (player) {
-  player.attackFrames = 20;
-  if(player.onGround){
-    player.facing = 'left';
-    player.reach_left = player.groundSideReach;
-  }
-  else{
-    if (player.facing === 'left'){
-      player.reach_left = player.aerialFrontReach;
-    }
-    else{
-      player.reach_left = player.aerialRearReach;
-    }
-  }
-};
-
-var rightAttack = function (player){
-  player.attackFrames = 20;
-  if(player.onGround){
-    player.facing = 'right';
-    player.reach_right = player.groundSideReach;
-    player.action = 'rightGroundAttack';
-  }
-  else{
-    if (player.facing === 'right'){
-      player.reach_right = player.aerialFrontReach;
-      player.action = 'rightAerialFrontAttack';
-    }
-    else{
-      player.reach_right = player.aerialRearReach;
-      player.action = 'rightAerialRearAttack';
-    }
-  }
-  for (var i = players.length - 1; i >= 0; i--) {
-    rightAttackCollision(player, players[i]);
-  }
-};
-
 var neutralAttack = function (player) {
-  player.attackFrames = neutralAttackFrames;
+  player.attackFrames = player.neutralAttackFrames;
   if (player.onGround){
     if (player.facing === 'right'){
       player.reach_right = player.groundNeutralReach;
@@ -157,54 +105,6 @@ var neutralAttackCollision = function(attacker, victim) {
   }
 };
 
-var leftAttackCollision = function(attacker, victim){
-  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
-    var dir = 0;
-    if ((victim.x+victim.width).between(attacker.x-attacker.reach_left, attacker.x+attacker.width)){
-      dir = -1;
-      if(attacker.onGround){
-        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
-      } else {
-        if (attacker.facing === 'left'){
-          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
-        }
-        if (attacker.facing === 'right'){
-          victim.v_x += dir * attacker.airRearAttackHitSpeed;
-        }
-      }
-    }
-  }
-};
-
-var rightAttackCollision = function(attacker, victim){
-  if (attacker.y.between(victim.y, victim.y+victim.height) || (attacker.y+attacker.height).between(victim.y, victim.y+victim.height)){
-    var dir = 0;
-    if (victim.x.between(attacker.x, attacker.x+attacker.width+attacker.reach_right)){
-      dir = 1;
-      if(attacker.onGround){
-        victim.v_x+= dir * attacker.leftGroundAttackHitSpeed;
-      }
-    
-      else{
-        if (attacker.facing === 'left'){
-          victim.v_x += dir * attacker.airFrontAttackHitSpeed;
-        }
-        if (attacker.facing === 'right'){
-          victim.v_x += dir * attacker.airRearAttackHitSpeed;
-        }
-      }
-    }
-  }
-};
-
-var upAttackCollision = function(attacker, victim){
-
-};
-
-var downAttackCollision = function(attacker, victim){
-
-};
-
 var canMove = function (player) {
   return player.damageFrames <= 0 && player.attackFrames <= 0;
 };
@@ -253,16 +153,16 @@ var runMove = function (playerId) {
         neutralAttack(player);
         break;
       case 'leftAttack':
-        leftAttack(player);
+        //leftAttack(player);
         break;
       case 'rightAttack':
-        rightAttack(player);
+        //rightAttack(player);
         break;
       case 'downAttack':
-        downAttack(player);
+        //downAttack(player);
         break;
       case 'upAttack':
-        upAttack(player);
+        //upAttack(player);
         break;
       // Basic attacks
       // Special moves
@@ -415,6 +315,7 @@ module.exports = {
   },
 
   get: function () {
+    //TODO(jvilk): This is empty...
     return state;
   },
   getSerialized: function () {
