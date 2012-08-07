@@ -237,17 +237,17 @@ var runMove = function (playerId) {
         break;
       case 'leftDown':
         player.moveLeft();
-        player.moveDown();
+        player.moveDown(gravity);
         break;
       case 'rightDown':
         player.moveRight();
-        player.moveDown();
+        player.moveDown(gravity);
         break;
       case 'up':
         player.moveUp();
         break;
       case 'down':
-        player.moveDown();
+        player.moveDown(gravity);
         break;
       case 'attack':
         neutralAttack(player);
