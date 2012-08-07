@@ -283,7 +283,7 @@ module.exports = {
     // 1: Randomize player update order.
     //
     // FOR EACH PLAYER:
-    // 2: Pass the player's character the playerstate,
+    // 2: Pass to the player's character object the playerstate,
     //    the stage, and the move that is being done.
     //    (left, leftattack, right, rightattack, etc)
     //    (or direction, isAttacking combo)
@@ -364,9 +364,18 @@ module.exports = {
     //    (sword + missile = kaboom).
     //
     // Other notes:
-    // * We should have a concept of 'weight' and 'force'.
+    // * We should have a concept of 'mass' and 'force'.
     // * Things should exert directed force on other things.
-    // * Damage decreases weight, as in Smash.
+    // * Damage decreases weight, as in Smash. (weight vs effective weight)
+    //   Player movement, which exerts a force, will always use weight.
+    //   Note that weight is determined by the current gravity. :)
+    // * We could also envision stages as a set of permanent 'nonplayer'
+    //   entities that cause a player to be grounded on collision.
+    //   Or that causes a player to move in a certain way on collision
+    //   with velocity (friction). This also makes it easy for us to make
+    //   moving platforms / slopes / one sided platforms / etc. :)
+    //   We'll have to process objects that occur first in this vector
+    //   of movement, though...
     
 
     // Process moves
